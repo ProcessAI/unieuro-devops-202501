@@ -1,0 +1,12 @@
+Color Highlight
+Docker
+EditorConfig for VS Code
+ES7+ React/Redux/React-Native snippets
+Image Preview
+Markdown Preview Github Styling
+Prettier - Code Formatter
+Prisma
+Regex Previewer
+Svg Preview
+Tailwind CSS IntelliSense
+Todo Tree
