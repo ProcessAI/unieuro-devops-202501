@@ -3,33 +3,34 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const slides = [
   {
-    title: "Xbox Consoles",
+    title: "Xbox no Atacado",
     description:
-      "Economize até 50% em jogos selecionados para Xbox. Receba 3 meses do PC Game Pass por R$10.",
-    buttonText: "Compre agora →",
+      "Descontos de até 50% na compra em volume de consoles e acessórios Xbox. Condições especiais para lojistas!",
+    buttonText: "Comprar no atacado →",
     imageUrl:
       "https://cms-assets.xboxservices.com/assets/bf/b0/bfb06f23-4c87-4c58-b4d9-ed25d3a739b9.png?n=389964_Hero-Gallery-0_A1_857x676.png",
     bgColor: "bg-gray-100",
   },
   {
-    title: "Promoção em Smartphones",
+    title: "Smartphones para Revenda",
     description:
-      "Aproveite descontos exclusivos em celulares das melhores marcas. Oferta por tempo limitado!",
-    buttonText: "Ver celulares →",
+      "Adquira smartphones das principais marcas com preços exclusivos para atacado. Ideal para revendedores e assistências técnicas.",
+    buttonText: "Ver ofertas atacado →",
     imageUrl:
       "https://phone-hub.in/cdn/shop/files/WE.png?crop=center&height=1200&v=1739377841&width=1200",
     bgColor: "bg-blue-50",
   },
   {
-    title: "Moda com 40% OFF",
+    title: "Moda em Lote com 40% OFF",
     description:
-      "Ofertas imperdíveis em roupas e acessórios. Aproveite e renove seu estoque!",
-    buttonText: "Conferir →",
+      "Roupas e acessórios com desconto progressivo por quantidade. Estoque renovado com as últimas tendências.",
+    buttonText: "Ver moda no atacado →",
     imageUrl:
       "https://www.pngplay.com/wp-content/uploads/12/Handbag-Transparent-Images.png",
     bgColor: "bg-green-50",
   },
 ];
+
 
 export function HeroCarousel() {
   return (
@@ -54,7 +55,7 @@ export function HeroCarousel() {
               <p className="text-lg mb-6 text-gray-700 whitespace-pre-line">
                 {slide.description}
               </p>
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+              <button className="cursor-pointer px-6 py-3 bg-[#DF9829] text-white rounded-lg hover:bg-[#C77714] transition">
                 {slide.buttonText}
               </button>
             </div>

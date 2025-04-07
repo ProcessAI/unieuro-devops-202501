@@ -6,7 +6,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-4 gap-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-[#C77714]">Institucional</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#DF9829]">Institucional</h3>
             <ul className="space-y-2">
               <li><a href="#" className="text-white hover:text-[#C77714]">Sobre nós</a></li>
               <li><a href="#" className="text-white hover:text-[#C77714]">Carreiras</a></li>
@@ -15,7 +15,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-4">Ajuda</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#DF9829]">Ajuda</h3>
             <ul className="space-y-2">
               <li><a href="#" className="text-white hover:text-[#C77714]">Central de ajuda</a></li>
               <li><a href="#" className="text-white hover:text-[#C77714]">Como comprar</a></li>
@@ -24,7 +24,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contato</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#DF9829]">Contato</h3>
             <ul className="space-y-2">
               <li className="flex items-center space-x-2">
                 <Mail size={18} className="text-white" />
@@ -37,7 +37,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-4">Redes Sociais</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#DF9829]">Redes Sociais</h3>
             <div className="flex space-x-4">
               <a href="#" className="text-white hover:text-[#C77714]"><Facebook size={24} /></a>
               <a href="#" className="text-white hover:text-[#C77714]"><Instagram size={24} /></a>
@@ -47,7 +47,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t mt-12 pt-8 text-center text-[#DF9829]">
-          <p>© 2024 Atacanet. Todos os direitos reservados.</p>
+          <p>© 2025 Atacanet. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

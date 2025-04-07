@@ -28,7 +28,7 @@
   /* input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus, */
-  textarea:-webkit-autofill,
+  /* textarea:-webkit-autofill,
   textarea:-webkit-autofill:hover,
   textarea:-webkit-autofill:focus,
   select:-webkit-autofill,
@@ -38,4 +38,32 @@
     -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset;
     transition: background-color 5000s ease-in-out 0s;
     caret-color: white;
-  }
+  } */
+
+
+.carousel .control-dots .dot {
+  background: #DF9829 !important;
+  opacity: 0.4;
+  transition: opacity 0.25s ease;
+}
+
+.carousel .control-dots .dot.selected {
+  opacity: 1;
+  background: #C77714 !important;
+}
+
+.carousel .control-prev.control-arrow:before {
+  border-right: 8px solid #DF9829 !important;
+}
+.carousel .control-next.control-arrow:before {
+  border-left: 8px solid #DF9829 !important;
+}
+
+.carousel .control-arrow:before, .carousel.carousel-slider .control-arrow:before {
+  border-top: 15px solid #0000 !important;
+  border-bottom: 15px solid #0000 !important;
+}
+
+.carousel.carousel-slider .control-arrow:hover {
+  background: #00000000 !important;
+}
