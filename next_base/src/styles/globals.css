@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+  body {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    background-color: #111;
+    color: #fff;
+  }
+  
+  h1, h2, h3, h4, h5, h6, p, span, label {
+    line-height: 1.5;
+  }
+
+  /* input {
+    border: none;
+    border-bottom: 2px solid #AFAFAF;
+    background-color: transparent;
+    color: white;
+    width: 100%;
+    transition: border-bottom-color 0.3s ease;
+  } */
+  
+  /* input:focus {
+    outline: none;
+    border-bottom-color: #4268f6;
+  } */
+  
+  /* input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus, */
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: white;
+  }
