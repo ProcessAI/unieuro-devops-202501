@@ -7,6 +7,7 @@ const publicRoutes = [
   { path: "/forgot-password", whenAuthenticated: "redirect" },
   { path: "/pricing", whenAuthenticated: "next" },
   { path: "/", whenAuthenticated: "next" },
+  { path: "/product", whenAuthenticated: "next" },
   { path: /^\/pedido\//, whenAuthenticated: "next" },
 ];
 
