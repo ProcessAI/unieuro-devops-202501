@@ -1,0 +1,7 @@
+- Material Icon ThemeMaterial Icon Theme
+- Prettier 
+- Docker
+- Dev containers
+- GitHub Pull Requests
+- Svg Preview
+-
