@@ -1,8 +1,8 @@
-import dotenv from "dotenv";
-import express, { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import cookieParser from "cookie-parser";
-import cors from "cors";
+import dotenv from 'dotenv';
+import express, { Request, Response, NextFunction } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ const PORT = 3333;
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: 'http://localhost:3000',
     credentials: true,
   })
 );
@@ -28,7 +28,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get("/cart", (req: Request, res: Response) => {
+app.get('/cart', (req: Request, res: Response) => {
   try {
     const idsParam = req.body.ids as string;
     if (!idsParam) {
@@ -36,15 +36,15 @@ app.get("/cart", (req: Request, res: Response) => {
     }
 
     // Exemplo de requisição: GET /cart?ids=1,2,3,4
-    
+
     // Converte a string para um array de números
     const ids = idsParam
-      .split(",")
+      .split(',')
       .map((item) => Number(item))
       .filter((id) => !isNaN(id));
 
     if (ids.length === 0) {
-      return res.sendError("Nenhum id válido informado.", 400);
+      return res.sendError('Nenhum id válido informado.', 400);
     }
 
     // TODO: Integração com Prisma para buscar os produtos reais do banco de dados.
@@ -78,27 +78,27 @@ app.get("/cart", (req: Request, res: Response) => {
     return res.sendSuccess({ products: dummyProducts });
   } catch (err) {
     console.error(err);
-    return res.sendError("Erro interno no servidor ao listar os produtos.", 500);
+    return res.sendError('Erro interno no servidor ao listar os produtos.', 500);
   }
 });
 
-app.post("/checkout", async (req: Request, res: Response) => {
+app.post('/checkout', async (req: Request, res: Response) => {
   try {
     // Espera receber no body um objeto contendo a propriedade "products"
     // que é um array de objetos com { id, quantity }
     const { products, paymentMethod } = req.body;
     if (!products || !Array.isArray(products)) {
-      return res.sendError("Payload inválido. Envie um array de produtos.", 400);
+      return res.sendError('Payload inválido. Envie um array de produtos.', 400);
     }
 
     if (!paymentMethod) {
-      return res.sendError("Forma de pagamento não informada ou inválida.", 400);
+      return res.sendError('Forma de pagamento não informada ou inválida.', 400);
     }
 
-    const allowedPaymentMethods = ["pix", "card", "boleto"];
+    const allowedPaymentMethods = ['pix', 'card', 'boleto'];
     if (!allowedPaymentMethods.includes(paymentMethod.toLowerCase())) {
       return res.sendError(
-        "Forma de pagamento inválida. Opções disponíveis: pix, card, boleto.",
+        'Forma de pagamento inválida. Opções disponíveis: pix, card, boleto.',
         400
       );
     }
@@ -137,14 +137,14 @@ app.post("/checkout", async (req: Request, res: Response) => {
     //
 
     return res.sendSuccess({
-      message: "Carrinho recebido com sucesso.",
+      message: 'Carrinho recebido com sucesso.',
       products,
       paymentMethod,
       // total: totalOrder //TODO: Futuramente, calculo do valor total.
     });
   } catch (err) {
     console.error(err);
-    return res.sendError("Erro interno no servidor.", 500);
+    return res.sendError('Erro interno no servidor.', 500);
   }
 });
 

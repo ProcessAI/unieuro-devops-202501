@@ -1,0 +1,31 @@
+{
+  "name": "next_base",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.31.0",
+    "axios": "^1.8.3",
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.487.0",
+    "next": "^15.3.1",
+    "next_base": "file:",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-responsive-carousel": "^3.2.23"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
