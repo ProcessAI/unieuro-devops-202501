@@ -88,7 +88,7 @@ cd unieuro-devops-202501
 
 ## 2. Subir o backend com Docker
 
-dentro de /server arquivo .env add 
+**dentro da pasta /server no arquivo .env add essa linha 
 ```bash 
 DATABASE_URL="postgresql://postgres:docker@localhost:15432/localhost?schema=public"
 ```
@@ -167,7 +167,8 @@ npx prisma validate
 
 # 📝 Observações Finais
 
-- A lógica de persistência e checkout com validação será implementada futuramente com Prisma.
+- Deixei as coisas sempre organizadas.
+- Confira as alteracoes sempre antes de coda, git pull pode te salvar.
 - Certifique-se de que o banco de dados esteja rodando antes de executar as migrações.
 
 ---
