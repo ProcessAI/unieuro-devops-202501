@@ -7,8 +7,8 @@ const API = axios.create({
   withCredentials: true,
 });
 
-export const login = async (email: string, password: string) => {
-  const response = await API.post('/login', { email, password });
+export const login = async (email: string, senha: string) => {
+  const response = await API.post('/login', { email, senha });
   if (response.status === 200) {
     const { accessToken, refreshToken } = response.data;
     document.cookie = `accessToken=${accessToken}; path=/;`;
