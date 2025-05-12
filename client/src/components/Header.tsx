@@ -78,7 +78,7 @@ export function Header() {
 
         {/* Botão Entrar */}
         <button className="cursor-pointer px-4 py-2 bg-[#DF9829] text-white rounded-lg hover:bg-[#C77714] transition">
-          Entrar
+          <a href='../pages/login'>Entrar</a>
         </button>
       </div>
     </div>

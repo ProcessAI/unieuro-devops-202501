@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -145,6 +146,32 @@ app.post('/checkout', async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.sendError('Erro interno no servidor.', 500);
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: 'E-mail e senha são obrigatórios.' });
+  }
+
+  try {
+    const cliente = await prisma.cliente.findUnique({ where: { email } });
+
+    if (!cliente) {
+      return res.status(404).json({ message: 'E-mail não cadastrado.' });
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, cliente.senha);
+    if (!senhaCorreta) {
+      return res.status(401).json({ message: 'Senha incorreta.' });
+    }
+
+    return res.status(200).json({ message: 'Login realizado com sucesso.', clienteId: cliente.id });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro no login.' });
   }
 });
 
