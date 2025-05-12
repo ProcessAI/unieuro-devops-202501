@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react';
+import Link from 'next/link';
 
 export function Header() {
   return (
@@ -78,7 +79,7 @@ export function Header() {
 
         {/* Botão Entrar */}
         <button className="cursor-pointer px-4 py-2 bg-[#DF9829] text-white rounded-lg hover:bg-[#C77714] transition">
-          <a href='../pages/login'>Entrar</a>
+          <Link href='/login'>Entrar</Link>
         </button>
       </div>
     </div>
