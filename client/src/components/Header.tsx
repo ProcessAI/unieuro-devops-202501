@@ -5,7 +5,7 @@ export function Header() {
   return (
     <div className="flex items-center justify-between h-16">
       <div className="flex items-center">
-        <img src="/logoAtacanet.svg" alt="Atacanet Logo" className="h-8 w-auto mr-2" />
+        <img src="/logoAtacanetHorizontalSimples.svg" alt="Atacanet Logo" className="h-8 w-auto mr-2" />
       </div>
 
       <div className="flex-1 max-w-2xl mx-8">

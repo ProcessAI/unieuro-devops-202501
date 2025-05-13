@@ -5,10 +5,12 @@ const publicRoutes = [
   { path: '/login', whenAuthenticated: 'redirect' },
   { path: '/register', whenAuthenticated: 'redirect' },
   { path: '/forgot-password', whenAuthenticated: 'redirect' },
+  { path: /^\/reset-password(?:\/.*)?$/, whenAuthenticated: 'redirect' },
   { path: '/pricing', whenAuthenticated: 'next' },
   { path: '/', whenAuthenticated: 'next' },
   { path: '/product', whenAuthenticated: 'next' },
   { path: /^\/pedido\//, whenAuthenticated: 'next' },
+  { path: /^\/verify-email(?:\/.*)?$/, whenAuthenticated: 'next' },
 ];
 
 const REDIRECT_WHEN_NOT_AUTHENTICATED_ROUTE = '/login';

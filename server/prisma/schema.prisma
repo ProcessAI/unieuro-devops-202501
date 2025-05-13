@@ -105,6 +105,11 @@ model Cliente {
   pedidos       Pedido[]
   avaliacoes    Avaliacao[]
   enderecos     Endereco[]
+  verificado          Boolean   @default(false)
+  tokenVerificacao   String?   @unique
+  tokenExpiracao        DateTime?
+  tokenRedefinicao       String?   @unique
+  tokenRedefinicaoExpira DateTime?
 }
 
 model Empresa {

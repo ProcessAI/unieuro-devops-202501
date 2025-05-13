@@ -1,16 +1,56 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
 
 const app = express();
 const PORT = 3333;
 const prisma = new PrismaClient();
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+async function sendVerificationEmail(email: string, token: string) {
+  const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  await transporter.sendMail({
+    from: `"Minha Loja" <${process.env.SMTP_FROM}>`,
+    to: email,
+    subject: 'Valide seu e-mail',
+    html: `
+      <p>Olá!</p>
+      <p>Clique no link abaixo para validar sua conta:</p>
+      <a href="${verifyUrl}">Clique aqui para validar</a>
+      <p>Esse link expira em 24 horas.</p>
+    `,
+  });
+}
+
+async function sendResetPasswordEmail(email: string, token: string) {
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+  await transporter.sendMail({
+    from: `"Minha Loja" <${process.env.SMTP_FROM}>`,
+    to: email,
+    subject: 'Redefinição de senha',
+    html: `
+      <p>Olá!</p>
+      <p>Clique no link abaixo para redefinir sua senha:</p>
+      <a href="${resetUrl}">Redefinir senha</a>
+      <p>Esse link expira em 1 hora.</p>
+    `,
+  });
+}
 
 app.use(
   cors({
@@ -165,6 +205,12 @@ app.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'E-mail não cadastrado.' });
     }
 
+    if (!cliente.verificado) {
+      return res.status(401).json({
+        message: 'Conta não validada. Verifique seu e-mail antes de entrar.',
+      });
+    }
+
     const senhaCorreta = await bcrypt.compare(senha, cliente.senha);
     if (!senhaCorreta) {
       return res.status(401).json({ message: 'Senha incorreta.' });
@@ -196,61 +242,191 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/register', async (req: any, res: any) => {
+app.post('/register', async (req:any, res:any) => {
   const { nome, email, senha, telefone, dataNascimento, cpf } = req.body;
 
-  // Validar os campos obrigatórios
+  // 1) Validação de campos obrigatórios
   if (!nome || !email || !senha || !telefone || !dataNascimento || !cpf) {
     return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
   }
 
   try {
-    // Verificar se o e-mail já está cadastrado
-    const clienteExistente = await prisma.cliente.findUnique({ where: { email } });
+    // 2) Transação: tudo aqui dentro é atômico
+    await prisma.$transaction(async (tx) => {
+      // 2.1) Checar duplicatas
+      const [existsEmail, existsCpf] = await Promise.all([
+        tx.cliente.findUnique({ where: { email } }),
+        tx.cliente.findUnique({ where: { cpf } })
+      ]);
 
-    if (clienteExistente) {
-      return res.status(400).json({ message: 'E-mail já cadastrado.' });
-    }
+      if (existsEmail) {
+        // lanço pra cair no catch e voltar 400
+        throw new Error('E-mail já cadastrado.');
+      }
+      if (existsCpf) {
+        throw new Error('CPF já cadastrado.');
+      }
 
-    // Verificar se o CPF já está cadastrado
-    const cpfExistente = await prisma.cliente.findUnique({ where: { cpf } });
+      // 2.2) Hash de senha e criação do cliente
+      const senhaHash = await bcrypt.hash(senha, 10);
+      const novoCliente = await tx.cliente.create({
+        data: {
+          nome,
+          email,
+          senha: senhaHash,
+          telefone,
+          dataNascimento: new Date(dataNascimento),
+          cpf,
+          ativo: true,
+          dataRegistro: new Date(),
+        }
+      });
 
-    if (cpfExistente) {
-      return res.status(400).json({ message: 'CPF já cadastrado.' });
-    }
+      // 2.3) Gerar token e atualizar no cliente
+      const token = crypto.randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // +24h
+      await tx.cliente.update({
+        where: { id: novoCliente.id },
+        data: {
+          tokenVerificacao: token,
+          tokenExpiracao: expires,
+        }
+      });
 
-    // Criptografar a senha
-    const senhaHash = await bcrypt.hash(senha, 10);
-
-    // Criar o novo cliente no banco de dados
-    const novoCliente = await prisma.cliente.create({
-      data: {
-        nome,
-        email,
-        senha: senhaHash,
-        telefone,
-        dataNascimento: new Date(dataNascimento), // Garantir que a data seja do tipo Date
-        cpf, // Adicionar o CPF
-        ativo: true, // Marcar o cliente como ativo por padrão
-        dataRegistro: new Date(), // Marcar a data de registro
-      },
+      // 2.4) Enviar e-mail de verificação
+      // Se isso der erro, lança e faz rollback de tudo acima
+      await sendVerificationEmail(novoCliente.email, token);
     });
 
-    // Retornar uma resposta de sucesso
+    // 3) Se chegou aqui, tudo deu certo
     return res.status(201).json({
-      message: 'Conta criada com sucesso.',
-      cliente: {
-        id: novoCliente.id,
-        nome: novoCliente.nome,
-        email: novoCliente.email,
-        telefone: novoCliente.telefone,
-        cpf: novoCliente.cpf, // Incluindo o CPF na resposta
-      },
+      message: 'Conta criada! Verifique seu e-mail para ativar a conta.'
     });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Erro ao criar conta.' });
+
+  } catch (err: any) {
+    console.error('Erro no /register:', err);
+
+    // Se foi erro de "já cadastrado", devolvo 400; senão 500
+    const isClientError =
+      err.message === 'E-mail já cadastrado.' ||
+      err.message === 'CPF já cadastrado.';
+    return res
+      .status(isClientError ? 400 : 500)
+      .json({ message: err.message || 'Erro ao criar conta.' });
   }
+});
+
+app.get('/verify-email', async (req, res) => {
+  const { token } = req.query as { token?: string };
+  if (!token) return res.sendError('Token ausente.', 400);
+
+  const cliente = await prisma.cliente.findFirst({
+    where: {
+      tokenVerificacao: token,
+      tokenExpiracao: { gte: new Date() }, // ainda não expirou
+    },
+  });
+  if (!cliente) return res.sendError('Link inválido ou expirado.', 400);
+
+  await prisma.cliente.update({
+    where: { id: cliente.id },
+    data: {
+      verificado: true,
+      tokenVerificacao: null,
+      tokenExpiracao: null,
+    },
+  });
+
+  // Aqui você pode redirecionar para uma página de confirmação no frontend
+  return res.sendSuccess({ message: 'E-mail verificado com sucesso!' });
+});
+
+app.post('/resend-verification', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.sendError('E-mail é obrigatório.', 400);
+
+  const cliente = await prisma.cliente.findUnique({ where: { email } });
+  if (!cliente)             return res.sendError('E-mail não cadastrado.', 404);
+  if (cliente.verificado)   return res.sendError('Conta já validada.', 400);
+
+  // gera novo token
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await prisma.cliente.update({
+    where: { id: cliente.id },
+    data: { tokenVerificacao: token, tokenExpiracao: expires },
+  });
+
+  await sendVerificationEmail(email, token);
+  return res.sendSuccess({
+    message: 'Novo e-mail de verificação enviado.',
+  });
+});
+
+app.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.sendError('E-mail obrigatório.', 400);
+
+  const cliente = await prisma.cliente.findUnique({ where: { email } });
+  if (!cliente) return res.sendError('E-mail não cadastrado.', 404);
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1h
+
+  await prisma.cliente.update({
+    where: { id: cliente.id },
+    data: {
+      tokenRedefinicao: token,
+      tokenRedefinicaoExpira: expires,
+    },
+  });
+
+  await sendResetPasswordEmail(email, token);
+  return res.sendSuccess({ message: 'E-mail de redefinição enviado.' });
+});
+
+app.get('/validate-reset-token', async (req, res) => {
+  const { token } = req.query as { token?: string };
+  if (!token) return res.sendError('Token ausente.', 400);
+
+  const cliente = await prisma.cliente.findFirst({
+    where: {
+      tokenRedefinicao: token,
+      tokenRedefinicaoExpira: { gte: new Date() },
+    },
+  });
+
+  if (!cliente) {
+    return res.sendError('Link inválido ou expirado.', 400);
+  }
+
+  return res.sendSuccess({ message: 'Token válido.' });
+});
+
+app.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) return res.sendError('Token e senha são obrigatórios.', 400);
+
+  const cliente = await prisma.cliente.findFirst({
+    where: {
+      tokenRedefinicao: token,
+      tokenRedefinicaoExpira: { gte: new Date() },
+    },
+  });
+  if (!cliente) return res.sendError('Token inválido ou expirado.', 400);
+
+  const senhaHash = await bcrypt.hash(password, 10);
+  await prisma.cliente.update({
+    where: { id: cliente.id },
+    data: {
+      senha: senhaHash,
+      tokenRedefinicao: null,
+      tokenRedefinicaoExpira: null,
+    },
+  });
+
+  return res.sendSuccess({ message: 'Senha redefinida com sucesso!' });
 });
 
 app.listen(PORT, () => {
