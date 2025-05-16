@@ -7,17 +7,17 @@ export async function getOfertas(req: Request, res: Response) {
       where: {
         ativo: true,
         preco: {
-          lt: prisma.$decimal('precoOriginal'), // apenas precaução, será sobrescrito abaixo
+          lt: prisma.$decimal('precoOriginal'), 
         },
       },
       include: {
         Midias: {
-          take: 1, // pega a primeira imagem
+          take: 1, 
         },
       },
     });
 
-    // Filtrar produtos que realmente têm desconto
+    
     const produtosComDesconto = produtos
       .filter(p => p.preco < p.precoOriginal)
       .map(p => ({
