@@ -6,6 +6,16 @@ import cors from 'cors';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 
+// Extende o tipo Response para incluir sendSuccess e sendError
+declare global {
+  namespace Express {
+    interface Response {
+      sendSuccess: (data: any) => void;
+      sendError: (message: string, status?: number) => void;
+    }
+  }
+}
+
 dotenv.config();
 
 const app = express();
