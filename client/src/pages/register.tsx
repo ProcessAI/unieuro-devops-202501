@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { formatCpfCnpj, validateCPF } from '../utils/cpfCnpj';
+import { formatDate, toISODate, validateDate } from '../utils/dateUtils';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
 import Image from 'next/image';
+import { useToast } from '@/components/ToastContext';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -13,46 +16,90 @@ export default function Register() {
     dataNascimento: '',
     cpf: '',
   });
+
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const cpfRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
+  const disabled = loading || Object.values(errors).some((msg) => !!msg);
+  const { showToast } = useToast();
   const router = useRouter();
 
-  // Função para lidar com a mudança dos campos do formulário
+  function setFieldError(field: string, msg = '') {
+    setErrors((prev) => ({ ...prev, [field]: msg }));
+  }
+
+  function clearFieldError(field: string) {
+    setErrors((prev) => ({ ...prev, [field]: '' }));
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value, selectionStart } = e.target;
+
+    let formatted = value;
+    let inputRef: any | null = null;
+
+    if (name === 'dataNascimento') {
+      formatted = formatDate(value);
+      inputRef = dateRef;
+    } else if (name === 'cpf') {
+      formatted = formatCpfCnpj(value);
+      inputRef = cpfRef;
+    }
+
+    const diff = formatted.length - value.length;
+
+    setFormData((prev) => ({ ...prev, [name]: formatted }));
+    clearFieldError(name);
+
+    if (inputRef?.current && selectionStart != null) {
+      const newPos = selectionStart + diff;
+      requestAnimationFrame(() => {
+        inputRef!.current!.setSelectionRange(newPos, newPos);
+      });
+    }
   };
 
-  // Função para enviar os dados do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.dataNascimento.length < 10) {
+      return setError('Preencha a data completa.');
+    }
+    if (!validateDate(formData.dataNascimento)) {
+      return setError('Data de nascimento inválida.');
+    }
+
+    const rawCpf = formData.cpf.replace(/\D/g, '');
+    if (rawCpf.length < 11) {
+      return setError('Preencha o CPF completo.');
+    }
+    if (!validateCPF(rawCpf)) {
+      return setError('CPF inválido.');
+    }
+
     setLoading(true);
     setError('');
-
     try {
-      // Enviar os dados para a rota de registro no backend
-      const response = await fetch('http://localhost:3333/register', {
+      const res = await fetch('http://localhost:3333/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          cpf: rawCpf,
+          dataNascimento: toISODate(formData.dataNascimento),
+        }),
       });
 
-      const result = await response.json();
+      const response = await res.json();
 
-      if (response.ok) {
-        // Redirecionar o usuário após o cadastro bem-sucedido
-        router.push('/login'); // Ou para uma página de login, por exemplo
+      if (res.ok) {
+        router.push('/login');
       } else {
-        // Exibir erro caso algo tenha dado errado
-        setError(result.message || 'Erro ao cadastrar usuário.');
+        showToast(response.mensage ?? 'Por favor tente novamente mais tarde.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError('Erro de rede, tente novamente mais tarde.');
     } finally {
       setLoading(false);
@@ -60,7 +107,7 @@ export default function Register() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0D0705]">
+    <main className="min-h-screen flex justify-center bg-[#0D0705] overflow-y-auto py-6 sm:items-center">
       <div className="w-full max-w-md bg-[#1A1615] p-8 rounded-2xl shadow-lg flex flex-col items-center">
         <Link href="/">
           <Image
@@ -73,6 +120,7 @@ export default function Register() {
         </Link>
         <h1 className="text-[#DF9829] text-center text-lg font-semibold mb-8">Cadastro</h1>
         <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+          {/* Nome */}
           <input
             type="text"
             name="nome"
@@ -83,15 +131,31 @@ export default function Register() {
             className="w-full px-4 py-3 rounded-md bg-black text-white placeholder:text-gray-400 focus:outline-none correct-input"
           />
 
+          {/* Data de nascimento */}
           <input
-            type="date"
+            ref={dateRef}
+            type="text"
             name="dataNascimento"
+            placeholder="Data de Nascimento (DD/MM/AAAA)"
             value={formData.dataNascimento}
             onChange={handleChange}
+            onBlur={() => {
+              const msg =
+                formData.dataNascimento.length < 10
+                  ? 'Data incompleta.'
+                  : !validateDate(formData.dataNascimento)
+                    ? 'Data inválida.'
+                    : '';
+              setFieldError('dataNascimento', msg);
+            }}
             required
             className="w-full px-4 py-3 rounded-md bg-black text-white placeholder:text-gray-400 focus:outline-none correct-input"
           />
+          {errors.dataNascimento && (
+            <div className="text-red-500 text-sm">{errors.dataNascimento}</div>
+          )}
 
+          {/* Telefone */}
           <input
             type="tel"
             name="telefone"
@@ -102,6 +166,7 @@ export default function Register() {
             className="w-full px-4 py-3 rounded-md bg-black text-white placeholder:text-gray-400 focus:outline-none correct-input"
           />
 
+          {/* Email */}
           <input
             type="email"
             name="email"
@@ -113,8 +178,10 @@ export default function Register() {
             className="w-full px-4 py-3 rounded-md bg-black text-white placeholder:text-gray-400 focus:outline-none correct-input"
           />
 
+          {/* Senha com toggle de visibilidade */}
           <div className="relative">
             <input
+              id="password"
               type={showPassword ? 'text' : 'password'}
               name="senha"
               placeholder="Senha..."
@@ -133,21 +200,30 @@ export default function Register() {
           </div>
 
           <input
+            ref={cpfRef}
             type="text"
             name="cpf"
             placeholder="CPF..."
+            maxLength={14}
             value={formData.cpf}
             onChange={handleChange}
+            onBlur={() => {
+              const raw = formData.cpf.replace(/\D/g, '');
+              const msg =
+                raw.length < 11 ? 'CPF incompleto.' : !validateCPF(raw) ? 'CPF inválido.' : '';
+              setFieldError('cpf', msg);
+            }}
             required
             className="w-full px-4 py-3 rounded-md bg-black text-white placeholder:text-gray-400 focus:outline-none correct-input"
           />
 
-          {error && <div className="text-red-500 text-sm text-center mb-4">{error}</div>}
-
+          {errors.cpf && (
+            <div className="text-red-500 text-sm">{errors.cpf}</div>
+          )}
           <button
             type="submit"
-            disabled={loading}
-            className="bg-[#DF9829] hover:bg-[#c67d1c] transition text-white font-semibold py-3 rounded-md"
+            disabled={disabled}
+            className={`bg-[#DF9829] text-white font-semibold py-3 rounded-md ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-[#c67d1c]'} cursor-pointer`}
           >
             {loading ? 'Cadastrando...' : 'Cadastrar'}
           </button>

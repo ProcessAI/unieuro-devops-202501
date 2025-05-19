@@ -15,7 +15,7 @@ const PORT = 3333;
 const prisma = new PrismaClient();
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: 'gmail',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -191,7 +191,7 @@ app.post('/checkout', async (req: Request, res: Response) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', async (req: any, res: any) => {
   const { email, senha } = req.body;
 
   if (!email || !senha) {
@@ -242,7 +242,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/register', async (req:any, res:any) => {
+app.post('/register', async (req: any, res: any) => {
   const { nome, email, senha, telefone, dataNascimento, cpf } = req.body;
 
   // 1) Validação de campos obrigatórios
@@ -256,7 +256,7 @@ app.post('/register', async (req:any, res:any) => {
       // 2.1) Checar duplicatas
       const [existsEmail, existsCpf] = await Promise.all([
         tx.cliente.findUnique({ where: { email } }),
-        tx.cliente.findUnique({ where: { cpf } })
+        tx.cliente.findUnique({ where: { cpf } }),
       ]);
 
       if (existsEmail) {
@@ -275,11 +275,11 @@ app.post('/register', async (req:any, res:any) => {
           email,
           senha: senhaHash,
           telefone,
-          dataNascimento: new Date(dataNascimento),
+          dataNascimento: new Date(`${dataNascimento}T00:00:00`),
           cpf,
           ativo: true,
           dataRegistro: new Date(),
-        }
+        },
       });
 
       // 2.3) Gerar token e atualizar no cliente
@@ -290,7 +290,7 @@ app.post('/register', async (req:any, res:any) => {
         data: {
           tokenVerificacao: token,
           tokenExpiracao: expires,
-        }
+        },
       });
 
       // 2.4) Enviar e-mail de verificação
@@ -300,16 +300,14 @@ app.post('/register', async (req:any, res:any) => {
 
     // 3) Se chegou aqui, tudo deu certo
     return res.status(201).json({
-      message: 'Conta criada! Verifique seu e-mail para ativar a conta.'
+      message: 'Conta criada! Verifique seu e-mail para ativar a conta.',
     });
-
   } catch (err: any) {
     console.error('Erro no /register:', err);
 
     // Se foi erro de "já cadastrado", devolvo 400; senão 500
     const isClientError =
-      err.message === 'E-mail já cadastrado.' ||
-      err.message === 'CPF já cadastrado.';
+      err.message === 'E-mail já cadastrado.' || err.message === 'CPF já cadastrado.';
     return res
       .status(isClientError ? 400 : 500)
       .json({ message: err.message || 'Erro ao criar conta.' });
@@ -346,8 +344,8 @@ app.post('/resend-verification', async (req, res) => {
   if (!email) return res.sendError('E-mail é obrigatório.', 400);
 
   const cliente = await prisma.cliente.findUnique({ where: { email } });
-  if (!cliente)             return res.sendError('E-mail não cadastrado.', 404);
-  if (cliente.verificado)   return res.sendError('Conta já validada.', 400);
+  if (!cliente) return res.sendError('E-mail não cadastrado.', 404);
+  if (cliente.verificado) return res.sendError('Conta já validada.', 400);
 
   // gera novo token
   const token = crypto.randomBytes(32).toString('hex');
