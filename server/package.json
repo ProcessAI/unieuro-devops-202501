@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/http/server.ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -27,7 +28,7 @@
     "@types/node": "^22.13.10",
     "@types/ws": "^8.18.0",
     "prettier": "^3.5.3",
-    "tsx": "^4.19.3",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.2"
   }
 }

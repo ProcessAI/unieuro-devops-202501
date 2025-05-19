@@ -175,6 +175,92 @@ app.post('/login', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+// 🧍 Cadastro (mantido como estava)
+app.post('/register', async (req: any, res: any) => {
+  const { nome, email, senha, telefone, dataNascimento, cpf } = req.body;
+
+  if (!nome || !email || !senha || !telefone || !dataNascimento || !cpf) {
+    return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+  }
+
+  try {
+    const clienteExistente = await prisma.cliente.findUnique({ where: { email } });
+    if (clienteExistente) {
+      return res.status(400).json({ message: 'E-mail já cadastrado.' });
+    }
+
+    const cpfExistente = await prisma.cliente.findUnique({ where: { cpf } });
+    if (cpfExistente) {
+      return res.status(400).json({ message: 'CPF já cadastrado.' });
+    }
+
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    const novoCliente = await prisma.cliente.create({
+      data: {
+        nome,
+        email,
+        senha: senhaHash,
+        telefone,
+        dataNascimento: new Date(dataNascimento),
+        cpf,
+        ativo: true,
+        dataRegistro: new Date(),
+      },
+    });
+
+    return res.status(201).json({
+      message: 'Conta criada com sucesso.',
+      cliente: {
+        id: novoCliente.id,
+        nome: novoCliente.nome,
+        email: novoCliente.email,
+        telefone: novoCliente.telefone,
+        cpf: novoCliente.cpf,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao criar conta.' });
+  }
+});
+
+
+
+app.get('/carrossel', async (req: Request, res: Response) => {
+  try {
+    const produtosCarrossel = await prisma.produto.findMany({
+      where: {
+        ativo: true,
+      },
+      include: {
+        Midias: {
+          take: 1,
+        },
+      },
+    });
+
+    const produtosFormatados = produtosCarrossel.map((produto) => ({
+      id: produto.id,
+      nome: produto.nome,
+      preco: produto.preco,
+      imagem: produto.Midias[0]?.link || null,
+      descricao: produto.descricao || null,
+    }));
+
+    res.json(produtosFormatados);
+  } catch (error: any) {
+    console.error('Erro ao buscar produtos para o carrossel:', error);
+    res.status(500).json({ error: 'Erro ao buscar os produtos.' });
+  } finally {
+    await prisma.$disconnect();
+  }
+});
+
+
+>>>>>>> 607253f (Implementação carrossel dinâmico com dados da API)
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
