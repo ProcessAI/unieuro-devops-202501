@@ -5,29 +5,10 @@ import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 
 export default function ProductSearchPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleSearch = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    if (!searchTerm) return;
-    
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/products?search=${searchTerm}`);
-      const data = await response.json();
-      setProducts(data);
-    } catch (error) {
-      console.error('Erro ao buscar produtos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#130F0E]">
+    <div className="min-h-screen flex flex-col bg-[#130F0E]">
       <header className="bg-[#130F0E] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Header />
@@ -35,39 +16,43 @@ export default function ProductSearchPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <form onSubmit={handleSearch} className="flex gap-4 mb-8">
-          <input
-            type="text"
-            placeholder="Buscar produtos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 rounded-lg text-black"
-          />
-          <button type="submit" className="bg-[#DF9829] text-white px-6 py-3 rounded-lg">
-            Buscar
-          </button>
-        </form>
-
+      <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
-          <p className="text-white">Carregando...</p>
+          <p className="text-white text-l sm:text-2xl lg:text-3xl ">Carregando...</p>
         ) : (
-          <div className="grid grid-cols-5 gap-6">
-            {products.length > 0 ? (
-              products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  image={product.image}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  discount={product.discount}
-                  minQuantity={product.minQuantity}
-                />
-              ))
-            ) : (
-              <p className="text-white">Nenhum produto encontrado.</p>
-            )}
-          </div>
+          <>
+            {/* Título separado dos cards */}
+            <div className="mb-15">
+              <p className="text-white text-l sm:text-2xl lg:text-3xl font-bold ">
+                Produto Buscado
+              </p>
+            </div>
+
+            {/* Grid dos cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <ProductCard
+                image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
+                price="799,99"
+                originalPrice="999,99"
+                discount={20}
+                minQuantity={3}
+              />
+              <ProductCard
+                image="https://images.unsplash.com/photo-1546868871-7041f2a55e12"
+                price="1599,99"
+                originalPrice="1899,99"
+                discount={15}
+                minQuantity={2}
+              />
+              <ProductCard
+                image="https://images.unsplash.com/photo-1585123334904-845d60e97b29"
+                price="1999,99"
+                originalPrice="2499,99"
+                discount={20}
+                minQuantity={1}
+              />
+            </div>
+          </>
         )}
       </div>
 
@@ -75,4 +60,3 @@ export default function ProductSearchPage() {
     </div>
   );
 }
-
