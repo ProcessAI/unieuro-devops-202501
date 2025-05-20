@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Package, Smartphone, Shirt, Heart, Percent, House } from 'lucide-react';
 import { Header } from '@/components/Header';
@@ -7,7 +8,32 @@ import { CategoryCard } from '@/components/CategoryCard';
 import { ProductCard } from '@/components/ProductCard';
 import { Footer } from '@/components/Footer';
 
+type ProdutoOferta = {
+  id: number;
+  nome: string;
+  preco: number;
+  precoOriginal: number;
+  desconto: number;
+  minQuantity: number;
+  image: string | null;
+};
+
 export default function Home() {
+  const [ofertas, setOfertas] = useState<ProdutoOferta[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3333/ofertas')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.produtos) {
+          setOfertas(data.produtos);
+        }
+      })
+      .catch((err) => {
+        console.error('Erro ao buscar ofertas:', err);
+      });
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#130F0E]">
       <header className="bg-[#130F0E] shadow-sm">
@@ -40,41 +66,20 @@ export default function Home() {
           </a>
         </div>
         <div className="grid grid-cols-5 gap-6">
-          <ProductCard
-            image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
-            price="799,99"
-            originalPrice="999,99"
-            discount={20}
-            minQuantity={3}
-          />
-          <ProductCard
-            image="https://images.unsplash.com/photo-1546868871-7041f2a55e12"
-            price="1599,99"
-            originalPrice="1899,99"
-            discount={15}
-            minQuantity={2}
-          />
-          <ProductCard
-            image="https://images.unsplash.com/photo-1585123334904-845d60e97b29"
-            price="1999,99"
-            originalPrice="2499,99"
-            discount={20}
-            minQuantity={1}
-          />
-          <ProductCard
-            image="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
-            price="149,99"
-            originalPrice="199,99"
-            discount={25}
-            minQuantity={5}
-          />
-          <ProductCard
-            image="https://images.unsplash.com/photo-1572635196237-14b3f281503f"
-            price="999,99"
-            originalPrice="1299,99"
-            discount={23}
-            minQuantity={2}
-          />
+          {ofertas.length > 0 ? (
+            ofertas.map((produto) => (
+              <ProductCard
+                key={produto.id}
+                image={produto.image || 'https://via.placeholder.com/150'}
+                price={produto.preco.toFixed(2).replace('.', ',')}
+                originalPrice={produto.precoOriginal.toFixed(2).replace('.', ',')}
+                discount={produto.desconto}
+                minQuantity={produto.minQuantity}
+              />
+            ))
+          ) : (
+            <p className="text-white col-span-5 text-center">Nenhuma oferta disponível no momento.</p>
+          )}
         </div>
       </div>
 

@@ -5,98 +5,99 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 model Produto {
-  id                  Int       @id @default(autoincrement())
-  nome                String
-  descricao           String
-  preco               Decimal
-  frete               Decimal
-  ativo               Boolean
-  categoriaId         Int
-  marcaId             Int
-  modelo              String
-  numeroModelo        String
-  condicao            String   // "novo | usado | seminovo"
-  dimensoes           String
-  garantia            String
-  voltagem            String
-  localizacaoProduto  String
-  dataCadastro        DateTime @default(now())
-  quantidade          Int
-  quantidadeVarejo    Int
-  Categoria           Categoria @relation(fields: [categoriaId], references: [id])
-  Marca               Marca    @relation(fields: [marcaId], references: [id])
-  avaliacoes          Avaliacao[] @relation
-  Desconto            Desconto[]  @relation("ProdutoDesconto")
-  Pedido              Pedido[]
-  Midias              Midia[]
+  id                 Int         @id @default(autoincrement())
+  nome               String
+  descricao          String
+  preco              Decimal
+  precoOriginal      Decimal // ✅ Campo novo aqui
+  frete              Decimal
+  ativo              Boolean
+  categoriaId        Int
+  marcaId            Int
+  modelo             String
+  numeroModelo       String
+  condicao           String
+  dimensoes          String
+  garantia           String
+  voltagem           String
+  localizacaoProduto String
+  dataCadastro       DateTime    @default(now())
+  quantidade         Int
+  quantidadeVarejo   Int
+  Categoria          Categoria   @relation(fields: [categoriaId], references: [id])
+  Marca              Marca       @relation(fields: [marcaId], references: [id])
+  avaliacoes         Avaliacao[]
+  Desconto           Desconto[]  @relation("ProdutoDesconto")
+  Pedido             Pedido[]
+  Midias             Midia[]
 }
 
 model Desconto {
-  id                   Int       @id @default(autoincrement())
-  nome                 String
-  tipoDesconto         String    // "porcentagem | numero fixo | valor fixo"
-  qtdProdutoDesconto   Int
-  qtdProdutosDesconto  Int
-  categoriaId          Int
-  Categoria            Categoria @relation(fields: [categoriaId], references: [id])
-  Produto              Produto[]  @relation("ProdutoDesconto")
+  id                  Int       @id @default(autoincrement())
+  nome                String
+  tipoDesconto        String // "porcentagem | numero fixo | valor fixo"
+  qtdProdutoDesconto  Int
+  qtdProdutosDesconto Int
+  categoriaId         Int
+  Categoria           Categoria @relation(fields: [categoriaId], references: [id])
+  Produto             Produto[] @relation("ProdutoDesconto")
 }
 
 model Categoria {
-  id       Int       @id @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   nome     String
   Produto  Produto[]
   Desconto Desconto[]
 }
 
 model Marca {
-  id       Int       @id @default(autoincrement())
-  nome     String
-  Produto  Produto[]
+  id      Int       @id @default(autoincrement())
+  nome    String
+  Produto Produto[]
 }
 
 model Midia {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   link      String
   produtoId Int
-  Produto   Produto  @relation(fields: [produtoId], references: [id])
+  Produto   Produto @relation(fields: [produtoId], references: [id])
 }
 
 model Avaliacao {
-  id          Int       @id @default(autoincrement())
-  nome        String
-  nota        Int       // Range de 1 a 5 ou 1 a 10
-  clienteId   Int
-  texto       String
-  dataAvaliacao DateTime @default(now())
-  produtoId   Int
-  Cliente     Cliente  @relation(fields: [clienteId], references: [id])
-  Produto     Produto  @relation(fields: [produtoId], references: [id])
-}
-
-model Pedido {
   id            Int      @id @default(autoincrement())
-  quantidade    Int
+  nome          String
+  nota          Int // Range de 1 a 5 ou 1 a 10
   clienteId     Int
-  dataCompra    DateTime @default(now())
+  texto         String
+  dataAvaliacao DateTime @default(now())
   produtoId     Int
-  formaPagamento String
-  status        String   // "pago | cancelado | pendente | devolvido | troca"
-  valorPago     Decimal
-  dataEntrega   DateTime
-  notaFiscal    String
-  dataDevolucao DateTime
-  assinado      String
   Cliente       Cliente  @relation(fields: [clienteId], references: [id])
   Produto       Produto  @relation(fields: [produtoId], references: [id])
 }
 
+model Pedido {
+  id             Int      @id @default(autoincrement())
+  quantidade     Int
+  clienteId      Int
+  dataCompra     DateTime @default(now())
+  produtoId      Int
+  formaPagamento String
+  status         String // "pago | cancelado | pendente | devolvido | troca"
+  valorPago      Decimal
+  dataEntrega    DateTime
+  notaFiscal     String
+  dataDevolucao  DateTime
+  assinado       String
+  Cliente        Cliente  @relation(fields: [clienteId], references: [id])
+  Produto        Produto  @relation(fields: [produtoId], references: [id])
+}
+
 model Cliente {
-  id            Int        @id @default(autoincrement())
-  nome          String
-  email         String     @unique
-  telefone      String
-  senha         String
+  id             Int         @id @default(autoincrement())
+  nome           String
+  email          String      @unique
+  telefone       String
+  senha          String
   dataNascimento DateTime
   cpf           String     @unique
   dataRegistro  DateTime   @default(now())
@@ -113,29 +114,29 @@ model Cliente {
 }
 
 model Empresa {
-  id                     Int        @id @default(autoincrement())
-  razaoSocial            String
-  nomeFantasia           String
-  telefone               String
-  email                  String
-  cnpj                   String     @unique
-  inscricaoEstadual      String
-  inscricaoMunicipal     String
-  clientes               Cliente[]  @relation("ClienteEmpresas")
+  id                 Int       @id @default(autoincrement())
+  razaoSocial        String
+  nomeFantasia       String
+  telefone           String
+  email              String
+  cnpj               String    @unique
+  inscricaoEstadual  String
+  inscricaoMunicipal String
+  clientes           Cliente[] @relation("ClienteEmpresas")
 }
 
 model Endereco {
-  id               Int      @id @default(autoincrement())
-  nome             String
-  clienteId        Int
-  bairro           String
-  cidade           String
-  estado           String
-  cep              String
-  complemento      String
-  numero           String
-  pontoReferencia  String
-  Cliente          Cliente @relation(fields: [clienteId], references: [id])
+  id              Int     @id @default(autoincrement())
+  nome            String
+  clienteId       Int
+  bairro          String
+  cidade          String
+  estado          String
+  cep             String
+  complemento     String
+  numero          String
+  pontoReferencia String
+  Cliente         Cliente @relation(fields: [clienteId], references: [id])
 }
 
 generator client {

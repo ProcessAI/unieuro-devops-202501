@@ -31,6 +31,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/ws": "^8.18.0",
     "prettier": "^3.5.3",
+    "prisma": "^6.8.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }

@@ -1,7 +1,16 @@
 import { Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export function Header() {
+  
+  const router = useRouter();
+
+  const handleSearch = () => {
+
+  router.push('/product-search');
+};
+
   return (
     <div className="flex items-center justify-between h-16">
       <div className="flex items-center">
@@ -15,7 +24,9 @@ export function Header() {
             placeholder="Busque produtos, marcas e muito mais..."
             className="w-full h-10 px-3 py-2 pr-10 text-base md:text-sm rounded-md border-none bg-[#1A1615] placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <Search className="absolute right-3 top-2.5 text-gray-400" size={20} />
+          <button onClick={handleSearch} className='cursor-pointer'>
+            <Search className="absolute right-3 top-2.5 text-gray-400" size={20} />
+          </button>
         </div>
       </div>
 
