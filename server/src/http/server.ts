@@ -243,6 +243,50 @@ app.post('/login', async (req: any, res: any) => {
   }
 });
 
+//login administrativo
+app.post('/admin/login', async (req: any, res: any) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: 'E-mail e senha são obrigatórios.' });
+  }
+
+  try {
+    // Busca o administrador no banco de dados
+    const admin = await prisma.admin_users.findUnique({ where: { email } });
+
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin não cadastrado.' });
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, admin.senha_hash);
+    if (!senhaCorreta) {
+      return res.status(401).json({ message: 'Senha incorreta.' });
+    }
+
+    const accessToken = jwt.sign(
+      { id: admin.id, email: admin.email, nivel: admin.nivel_acesso },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: '1h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: admin.id, email: admin.email, nivel: admin.nivel_acesso },
+      process.env.REFRESH_TOKEN_SECRET!,
+      { expiresIn: '365d' }
+    );
+
+    return res.status(200).json({
+      message: 'Login administrativo realizado com sucesso.',
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro no login administrativo.' });
+  }
+});
+
 // 🧍 Cadastro (mantido como estava)
 app.post('/register', async (req: any, res: any) => {
   const { nome, email, senha, telefone, dataNascimento, cpf } = req.body;
