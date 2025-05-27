@@ -22,7 +22,7 @@ export default function Home() {
   const [ofertas, setOfertas] = useState<ProdutoOferta[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:3333/ofertas')
+    fetch('/api/ofertas')
       .then((res) => res.json())
       .then((data) => {
         if (data.produtos) {

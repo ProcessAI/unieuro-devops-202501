@@ -20,7 +20,8 @@ export function HeroCarousel() {
     const buscarImagensCarrossel = async () => {
       try {
         
-        const response = await fetch('http://localhost:3333/carrossel');
+        const response = await fetch('/api/carrossel');
+        console.log('response', response.json)
 
         if (!response.ok) {
         

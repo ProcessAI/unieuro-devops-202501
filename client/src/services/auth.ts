@@ -3,7 +3,7 @@ import axios from 'axios';
 const production = false;
 
 const API = axios.create({
-  baseURL: production ? 'https://.com.br' : 'http://localhost:3333',
+  baseURL: '/api',
   withCredentials: true,
 });
 
