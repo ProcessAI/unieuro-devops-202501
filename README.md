@@ -161,6 +161,9 @@ npx prisma studio
 
 # Validar conexão e schema
 npx prisma validate
+
+# Povoar o banco de dados
+npx tsx prisma/seed.ts
 ```
 
 ---
