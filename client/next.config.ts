@@ -14,6 +14,12 @@ const nextConfig: NextConfig = {
         source: '/ofertas',
         destination: 'http://localhost:3333/ofertas',
       },
+      // 🆕 NOVA ROTA ADICIONADA - Usuários (específica antes da genérica)
+      {
+        source: '/api/usuarios/:path*',
+        destination: 'http://localhost:3333/usuarios/:path*',
+      },
+      // Rota genérica - MANTIDA COMO ESTAVA
       // Se você tem outras rotas no backend que o frontend acessa
       // e quer usar um prefixo /api para elas via axios, por exemplo:
       {
