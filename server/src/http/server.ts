@@ -473,6 +473,51 @@ app.post('/reset-password', async (req, res) => {
   return res.sendSuccess({ message: 'Senha redefinida com sucesso!' });
 });
 
+app.get('/produto/:id', async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.sendError('ID inválido.', 400);
+  }
+
+  try {
+    const produto = await prisma.produto.findUnique({
+      where: { id },
+      include: {
+        Midias: { take: 1 },
+        avaliacoes: {
+          select: {
+            id: true,
+            nome: true,
+            nota: true,
+            texto: true,
+          },
+        },
+      },
+    });
+
+    if (!produto) {
+      return res.sendError('Produto não encontrado.', 404);
+    }
+
+    res.sendSuccess({
+      id: produto.id,
+      nome: produto.nome,
+      descricao: produto.descricao,
+      preco: Number(produto.preco),
+      precoOriginal: Number(produto.precoOriginal),
+      frete: Number(produto.frete),
+      modelo: produto.modelo,
+      quantidadeVarejo: produto.quantidadeVarejo,
+      Midias: produto.Midias,
+      avaliacoes: produto.avaliacoes,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.sendError('Erro ao buscar produto.', 500);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

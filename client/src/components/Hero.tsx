@@ -80,7 +80,7 @@ export function HeroCarousel() {
                 <p className="text-lg mb-6 text-gray-700 whitespace-pre-line">{item.descricao}</p>
               )}
               {/* Adiciona Link para a página do produto, se aplicável */}
-              <Link href={`/product?id=${item.id}`} legacyBehavior>
+              <Link href={`/product/${item.id}`} legacyBehavior>
                 <a className="cursor-pointer px-6 py-3 bg-[#DF9829] text-white rounded-lg hover:bg-[#C77714] transition">
                   Ver detalhes →
                 </a>
