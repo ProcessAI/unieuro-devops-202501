@@ -6,13 +6,20 @@ import cors from 'cors';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
+import axios from 'axios';
 
 dotenv.config();
 
 const app = express();
 const PORT = 3333;
 const prisma = new PrismaClient();
+
+const billingTypeMap: Record<string, string> = {
+  pix: 'PIX',
+  card: 'CREDIT_CARD',
+  boleto: 'BOLETO',
+};
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -195,6 +202,218 @@ app.post('/checkout', async (req: Request, res: Response) => {
   });
 });
 
+app.post('/create-payment-link', async (req: Request, res: Response) => {
+  try {
+    let token = '';
+    const authHeader = String(req.headers.authorization || '');
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.replace(/^Bearer\s+/, '').trim();
+    } else if (req.cookies && req.cookies.accessToken) {
+      token = String(req.cookies.accessToken);
+    } else {
+      return res.sendError('Token de autenticação não fornecido.', 401);
+    }
+
+    let payload: any;
+    try {
+      payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
+    } catch {
+      return res.sendError('Token inválido ou expirado.', 401);
+    }
+
+    const userId = Number(payload.id);
+    if (!userId) {
+      return res.sendError('Token é necessário para esta requisição.', 401);
+    }
+
+    const { products, paymentMethod } = req.body as {
+      products: Array<{ id: number; quantity: number }>;
+      paymentMethod: 'pix' | 'card' | 'boleto';
+    };
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.sendError('Envie um array de produtos (id + quantity).', 400);
+    }
+    if (!billingTypeMap[paymentMethod]) {
+      return res.sendError('paymentMethod inválido. Use "pix", "card" ou "boleto".', 400);
+    }
+    const productIds = products.map((p) => p.id);
+    const produtosDoBanco = await prisma.produto.findMany({
+      where: { id: { in: productIds } },
+      select: {
+        id: true,
+        nome: true,
+        preco: true,
+        precoOriginal: true,
+        quantidadeVarejo: true,
+      },
+    });
+    if (produtosDoBanco.length === 0) {
+      return res.sendError('Nenhum produto válido encontrado pelo ID.', 400);
+    }
+    const mapaProdutos = new Map<
+      number,
+      {
+        nome: string;
+        preco: number;
+        precoOriginal: number;
+        quantidadeVarejo: number;
+      }
+    >();
+    produtosDoBanco.forEach((p) => {
+      mapaProdutos.set(p.id, {
+        nome: p.nome,
+        preco: Number(p.preco.toString()),
+        precoOriginal: Number(p.precoOriginal.toString()),
+        quantidadeVarejo: p.quantidadeVarejo,
+      });
+    });
+    let valorTotal = 0;
+    const descricaoItens: string[] = [];
+    for (const item of products) {
+      const dados = mapaProdutos.get(item.id);
+      if (!dados) {
+        return res.sendError(`Produto de ID ${item.id} não encontrado no banco.`, 400);
+      }
+      let unitPrice = dados.preco;
+      if (item.quantity >= 3) {
+        unitPrice = dados.preco * 0.9;
+      }
+      const subTotal = unitPrice * item.quantity;
+      valorTotal += subTotal;
+      descricaoItens.push(`${dados.nome} (x${item.quantity}) → R$ ${subTotal.toFixed(2)}`);
+    }
+    const valorTotalStr = valorTotal.toFixed(2);
+    const agora = new Date();
+    const venc = new Date(agora.getTime() + 24 * 60 * 60 * 1000);
+    const yyyy = venc.getFullYear();
+    const mm = String(venc.getMonth() + 1).padStart(2, '0');
+    const dd = String(venc.getDate()).padStart(2, '0');
+    const dueDate = `${yyyy}-${mm}-${dd}`;
+    const payloadAsaas = {
+      billingType: billingTypeMap[paymentMethod],
+      value: valorTotalStr,
+      dueDate,
+      description: `Compra no AtacaNet:\n${descricaoItens.join('\n')}`,
+      returnUrl: `${process.env.FRONTEND_URL}/order-confirmation`,
+    };
+    const resposta = await axios.post(
+      // 'https://www.asaas.com/v3/paymentLinks',
+      'https://api-sandbox.asaas.com/v3/paymentLinks',
+      payloadAsaas,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          access_token: process.env.ASAAS_API_KEY!,
+        },
+      }
+    );
+    console.log(resposta)
+    const paymentLinkUrl = resposta.data.paymentLinkUrl as string;
+    if (!paymentLinkUrl) {
+      return res.sendError('Não foi possível obter a URL de pagamento do Asaas.', 500);
+    }
+    return res.sendSuccess({ paymentLinkUrl });
+  } catch (err: any) {
+    console.error('Erro em /create-payment-link:', err.response?.data || err);
+    const message = err.response?.data?.message || 'Erro interno ao criar payment link.';
+    return res.sendError(message, 500);
+  }
+});
+
+app.post('/webhook', async (req: any, res: any) => {
+  try {
+    if (process.env.ASAAS_WEBHOOK_TOKEN) {
+      console.warn(
+        `[WEBHOOK] Token ausente ou inválido. ASAAS_WEBHOOK_TOKEN: '${process.env.ASAAS_WEBHOOK_TOKEN}'`
+      );
+      return res.sendStatus(401);
+    }
+    
+    const event = req.body as any;
+
+    if (
+      event.object === 'payment' &&
+      (event.event === 'PAYMENT_RECEIVED' || event.event === 'PAYMENT_CONFIRMED')
+    ) {
+      const pagamento = event.payment;
+      const asaasCustomerId = pagamento.customer;
+      const externalRef = pagamento.externalReference;
+      const valorPago = pagamento.value;
+      const dueDate = pagamento.dueDate;
+
+      const pedidoId = parseInt(externalRef, 10);
+      if (isNaN(pedidoId)) {
+        console.warn('[WEBHOOK] externalReference inválido:', externalRef);
+        return res.sendStatus(200);
+      }
+      const pedidoRegistro = await prisma.pedido.findUnique({
+        where: { id: pedidoId },
+        include: { Cliente: true },
+      });
+      if (!pedidoRegistro) {
+        console.warn('[WEBHOOK] Pedido não encontrado para externalReference:', externalRef);
+        return res.sendStatus(200);
+      }
+
+      await prisma.pedido.update({
+        where: { id: pedidoRegistro.id },
+        data: {
+          status: 'pago',
+          valorPago: new Prisma.Decimal(valorPago),
+          dataCompra: new Date(),
+        },
+      });
+
+      const invoicePayload = {
+        customer: asaasCustomerId,
+        billingType: 'INVOICE',
+        description: `Nota fiscal para o pedido ${externalRef}`,
+        dueDate,
+        value: valorPago.toString(),
+        externalReference: externalRef,
+      };
+
+      const invoiceResponse = await axios.post(
+        // 'https://www.asaas.com/api/v3/invoices',
+        'https://api-sandbox.asaas.com/api/v3/invoices',
+        invoicePayload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            access_token: process.env.ASAAS_API_KEY!,
+          },
+        }
+      );
+      const invoiceData = invoiceResponse.data;
+      const invoicePdfUrl = invoiceData.pdf || invoiceData.invoiceUrl;
+
+      const clienteEmail = pedidoRegistro.Cliente.email;
+      const mailOptions = {
+        from: `"Minha Loja" <${process.env.SMTP_FROM}>`,
+        to: clienteEmail,
+        subject: `Sua nota fiscal - Pedido ${externalRef}`,
+        html: `
+          <p>Olá ${pedidoRegistro.Cliente.nome},</p>
+          <p>Recebemos o pagamento do seu pedido <strong>${externalRef}</strong> (valor R$ ${valorPago.toFixed(
+            2
+          )}).</p>
+          <p>Aqui está a sua nota fiscal:</p>
+          <p><a href="${invoicePdfUrl}" target="_blank">Clique para baixar a nota fiscal</a></p>
+          <p>Obrigado pela preferência!</p>
+        `,
+      };
+      await transporter.sendMail(mailOptions);
+      console.log(`[WEBHOOK] Nota fiscal enviada para ${clienteEmail} (pedido ${externalRef})`);
+      return res.sendStatus(200);
+    }
+
+    return res.sendStatus(200);
+  } catch (err: any) {
+    console.error('Erro em /webhook:', err);
+    return res.sendStatus(500);
+  }
+});
+
 app.post('/login', async (req: any, res: any) => {
   const { email, senha } = req.body;
 
@@ -240,6 +459,53 @@ app.post('/login', async (req: any, res: any) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Erro no login.' });
+  }
+});
+
+app.post('/refresh-token', async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.cookies as { refreshToken?: string };
+    if (!refreshToken) {
+      return res.sendError('Refresh token não fornecido.', 401);
+    }
+
+    let payload: any;
+    try {
+      payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
+    } catch {
+      return res.sendError('Refresh token inválido ou expirado.', 401);
+    }
+
+    const userId = Number(payload.id);
+    if (!userId) {
+      return res.sendError('Payload de refreshToken inválido.', 401);
+    }
+
+    const usuario = await prisma.cliente.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true },
+    });
+    if (!usuario) {
+      return res.sendError('Usuário não existe.', 401);
+    }
+
+    const newAccessToken = jwt.sign(
+      { id: usuario.id, email: usuario.email },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: '2m' }
+    );
+
+    res.cookie('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 2 * 60 * 1000, // 2 minutos em milissegundos
+    });
+
+    return res.sendSuccess('Token de acesso renovado!');
+  } catch (err: any) {
+    console.error('Erro em /refresh-token:', err);
+    return res.sendError('Erro interno ao renovar token.', 500);
   }
 });
 

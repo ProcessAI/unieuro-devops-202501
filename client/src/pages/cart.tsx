@@ -1,6 +1,11 @@
-import { useState } from 'react';
-import { IconTrash, IconPlus, IconMinus } from '@tabler/icons-react';
+import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
+import { IconTrash, IconPlus, IconMinus, IconArrowLeft } from '@tabler/icons-react';
 import { IconQrcode, IconCreditCard, IconBarcode } from '@tabler/icons-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useToast } from '@/components/ToastContext';
+import { apiFetch } from '@/utils/apiClient';
 
 type Product = {
   id: number;
@@ -11,6 +16,15 @@ type Product = {
 };
 
 export default function CartPage() {
+  const { showToast } = useToast();
+  const [isLogged, setIsLogged] = useState(false);
+
+  useEffect(() => {
+    if (Cookies.get('refreshToken')) {
+      setIsLogged(true);
+    }
+  }, []);
+
   const [products, setProducts] = useState<Product[]>([
     {
       id: 1,
@@ -71,6 +85,49 @@ export default function CartPage() {
     return acc + unitPrice * product.quantity;
   }, 0);
 
+  const getSelectedPaymentMethod = (): 'pix' | 'card' | 'boleto' => {
+    const checked = document.querySelector(
+      'input[name="payment"]:checked'
+    ) as HTMLInputElement | null;
+    return (checked?.id as 'pix' | 'card' | 'boleto') || 'pix';
+  };
+
+  const handleCheckout = async () => {
+    try {
+      if (products.length === 0) {
+        showToast('Seu carrinho está vazio.');
+        return;
+      }
+      const payload = {
+        products: products.map((p) => ({
+          id: p.id,
+          quantity: p.quantity,
+        })),
+        paymentMethod: getSelectedPaymentMethod(),
+      };
+
+      const response = await apiFetch('/api/create-payment-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        showToast('Erro ao criar link de pagamento: ' + error.message);
+        return;
+      }
+
+      const data = (await response.json()) as { paymentLinkUrl: string };
+      window.location.href = data.paymentLinkUrl;
+    } catch {
+      showToast('Ocorreu um erro inesperado.');
+    }
+  };
+
   return (
     <main className="bg-[#000000] w-full h-screen text-white p-8">
       <div className="w-full h-full rounded-md p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -78,71 +135,122 @@ export default function CartPage() {
           <div className="mb-6">
             <h1 className="text-2xl font-extralight">Resumo do Pedido</h1>
           </div>
-          <div className="flex-1 overflow-y-auto pr-2 justify-center">
-            <ul className="p-4 space-y-4" aria-label="Lista de itens do carrinho">
-              {products.map((product) => {
-                const hasDiscount = product.quantity >= 3;
-                const discountPrice = product.price * 0.9;
-                return (
-                  <li
-                    key={product.id}
-                    className="flex justify-between items-center bg-[#1A1615] py-6 px-10"
-                  >
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-20 h-20 bg-black rounded-full"
-                      />
-                      <div className="flex flex-col">
-                        <strong className="font-semibold">{product.name}</strong>
-                        {hasDiscount ? (
-                          <div className="flex items-center gap-2">
-                            <span className="line-through text-gray-400">
-                              R$ {product.price.toFixed(2)}
-                            </span>
-                            <span className="text-[#DF9829]">R$ {discountPrice.toFixed(2)}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">R$ {product.price.toFixed(2)}</span>
-                        )}
+          <div className="flex-1 overflow-y-auto pr-2">
+            {products.length > 0 ? (
+              <ul className="p-4 space-y-4" aria-label="Lista de itens do carrinho">
+                {products.map((product) => {
+                  const hasDiscount = product.quantity >= 3;
+                  const discountPrice = product.price * 0.9;
+                  return (
+                    <li
+                      key={product.id}
+                      className="flex justify-between items-center bg-[#1A1615] py-6 px-10"
+                    >
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-20 h-20 bg-black rounded-full"
+                        />
+                        <div className="flex flex-col">
+                          <strong className="font-semibold">{product.name}</strong>
+                          {hasDiscount ? (
+                            <div className="flex items-center gap-2">
+                              <span className="line-through text-gray-400">
+                                R$ {product.price.toFixed(2)}
+                              </span>
+                              <span className="text-[#DF9829]">R$ {discountPrice.toFixed(2)}</span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">R$ {product.price.toFixed(2)}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDecreaseQuantity(product.id)}
+                            className="p-1 bg-[#DF9829] text-black rounded hover:opacity-80"
+                            aria-label="Diminuir quantidade"
+                          >
+                            <IconMinus size={16} />
+                          </button>
+                          <span>{product.quantity}</span>
+                          <button
+                            onClick={() => handleIncreaseQuantity(product.id)}
+                            className="p-1 bg-[#DF9829] text-black rounded hover:opacity-80"
+                            aria-label="Aumentar quantidade"
+                          >
+                            <IconPlus size={16} />
+                          </button>
+                        </div>
                         <button
-                          onClick={() => handleDecreaseQuantity(product.id)}
-                          className="p-1 bg-[#DF9829] text-black rounded hover:opacity-80"
-                          aria-label="Diminuir quantidade"
+                          onClick={() => handleRemoveProduct(product.id)}
+                          className="text-white hover:text-red-500 ml-5"
+                          aria-label="Remover item"
                         >
-                          <IconMinus size={16} />
-                        </button>
-                        <span>{product.quantity}</span>
-                        <button
-                          onClick={() => handleIncreaseQuantity(product.id)}
-                          className="p-1 bg-[#DF9829] text-black rounded hover:opacity-80"
-                          aria-label="Aumentar quantidade"
-                        >
-                          <IconPlus size={16} />
+                          <IconTrash size={20} />
                         </button>
                       </div>
-                      <button
-                        onClick={() => handleRemoveProduct(product.id)}
-                        className="text-white hover:text-red-500 ml-5"
-                        aria-label="Remover item"
-                      >
-                        <IconTrash size={20} />
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="bg-[#1A1615] text-white rounded-lg py-10 flex flex-col md:flex-row justify-around md:items-start gap-8 w-full max-w-3xl">
+                  <div>
+                    <Image
+                      src="/logoAtacanetVertical.svg"
+                      width={500}
+                      height={500}
+                      alt="Carrinho vazio"
+                      className="w-40 h-40 object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                    <h2 className="text-2xl font-semibold mb-2">Seu carrinho está vazio</h2>
+                    <p className="text-zinc-500 mb-6">Compre itens no melhor preço</p>
+                    {!isLogged ? (
+                      <div className="flex flex-col sm:flex-row gap-4 font-semibold">
+                        <Link
+                          href="/login"
+                          className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg"
+                        >
+                          Faça login
+                        </Link>
+                        <Link
+                          href="/register"
+                          className="border border-zinc-600 hover:bg-zinc-600 text-white px-6 py-2 rounded-lg"
+                        >
+                          Crie uma conta
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="flex items-end">
+                        <Link
+                          href="/"
+                          className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg"
+                        >
+                          Compre produtos aqui
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           <footer className="mt-8 flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4">
-            <a href="#" className="text-white underline hover:text-gray-300">
-              &larr; Voltar à loja
-            </a>
+            <div className="flex flex-row">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1 text-white underline hover:text-gray-300"
+              >
+                <IconArrowLeft size={20} />
+                <span>Voltar à loja</span>
+              </Link>
+            </div>
             <p className="text-xl font-semibold">
               Total: <span className="text-[#DF9829]">R$ {total.toFixed(2)}</span>
             </p>
@@ -166,10 +274,7 @@ export default function CartPage() {
                   defaultChecked
                   className="sr-only peer"
                 />
-                <div
-                  className="w-6 h-6 bg-transparent border-2 border-[#DF9829] rounded-full 
-                    peer-checked:bg-[#DF9829] transition duration-300 ease-in-out"
-                ></div>
+                <div className="w-6 h-6 bg-transparent border-2 border-[#DF9829] rounded-full peer-checked:bg-[#DF9829] transition duration-300 ease-in-out"></div>
                 <IconQrcode size={30} className="ml-2 text-[#DF9829]" />
                 <span className="ml-2 text-white">Pix</span>
               </label>
@@ -178,10 +283,7 @@ export default function CartPage() {
                 className="relative flex items-center bg-black p-6 mb-4 cursor-pointer"
               >
                 <input type="radio" name="payment" id="card" className="sr-only peer" />
-                <div
-                  className="w-6 h-6 bg-transparent border-2 border-[#DF9829] rounded-full 
-                    peer-checked:bg-[#DF9829] transition duration-300 ease-in-out"
-                ></div>
+                <div className="w-6 h-6 bg-transparent border-2 border-[#DF9829] rounded-full peer-checked:bg-[#DF9829] transition duration-300 ease-in-out"></div>
                 <IconCreditCard size={30} className="ml-2 text-[#DF9829]" />
                 <span className="ml-2 text-white">Cartão</span>
               </label>
@@ -190,10 +292,7 @@ export default function CartPage() {
                 className="relative flex items-center bg-black p-6 mb-4 cursor-pointer"
               >
                 <input type="radio" name="payment" id="boleto" className="sr-only peer" />
-                <div
-                  className="w-6 h-6 bg-transparent border-2 border-[#DF9829] rounded-full 
-                    peer-checked:bg-[#DF9829] transition duration-300 ease-in-out"
-                ></div>
+                <div className="w-6 h-6 bg-transparent border-2 border-[#DF9829] rounded-full peer-checked:bg-[#DF9829] transition duration-300 ease-in-out"></div>
                 <IconBarcode size={30} className="ml-2 text-[#DF9829]" />
                 <span className="ml-2 text-white">Boleto</span>
               </label>
@@ -202,6 +301,7 @@ export default function CartPage() {
           <button
             type="button"
             className="mt-6 bg-[#DF9829] text-black font-semibold py-3 w-full rounded hover:opacity-90"
+            onClick={handleCheckout}
           >
             Finalizar Compra
           </button>
