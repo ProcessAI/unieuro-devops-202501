@@ -9,7 +9,7 @@ const data = [
 
 const PieChart: React.FC = () => {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg">
+    <div className="bg-[#1A1615] p-6 rounded-lg">
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-gray-400 text-sm font-medium mb-2">CHART TITLE</div>

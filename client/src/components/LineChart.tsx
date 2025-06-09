@@ -12,7 +12,7 @@ const data = [
 
 const LineChart: React.FC = () => {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg">
+    <div className="bg-[#1A1615] p-6 rounded-lg">
       <div className="mb-6">
         <div className="text-gray-400 text-sm font-medium mb-2">CHART TITLE</div>
         <div className="text-blue-400 text-2xl font-bold mb-1">5.000,00</div>

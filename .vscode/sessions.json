@@ -1,0 +1,43 @@
+{
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v10/terminal-keeper.json",
+  "active": "default",
+  "activateOnStartup": true,
+  "keepExistingTerminals": false,
+  "sessions": {
+    "default": [
+      {
+        "name": "Banco",
+        "icon": "database",
+        "color": "terminal.ansiBlue",
+        "autoExecuteCommands": true,
+        "commands": [
+          "cd server",
+          "docker-compose up -d",
+          "npx prisma generate",
+          "npx prisma migrate dev",
+          "npx prisma studio"
+        ]
+      },
+      {
+        "name": "Server",
+        "icon": "server-process",
+        "color": "terminal.ansiGreen",
+        "autoExecuteCommands": true,
+        "commands": [
+          "cd server",
+          "npm run dev"
+        ]
+      },
+      {
+        "name": "Client",
+        "icon": "rocket",
+        "color": "terminal.ansiMagenta",
+        "autoExecuteCommands": true,
+        "commands": [
+          "cd client",
+          "npm run dev"
+        ]
+      }
+    ]
+  }
+}

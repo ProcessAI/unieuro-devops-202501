@@ -32,7 +32,6 @@ interface ProdutoPageProps {
 }
 
 export default function Produto({ produto }: ProdutoPageProps) {
-  // Se não existir nenhuma mídia, usamos placeholder:
   const primeiraImagem = produto.Midias[0]?.link || '/placeholder.png';
 
   return (
