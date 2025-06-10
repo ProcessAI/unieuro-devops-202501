@@ -243,6 +243,128 @@ app.post('/login', async (req: any, res: any) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+/*
+//login administrativo
+app.post('/admin/login', async (req: any, res: any) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: 'E-mail e senha são obrigatórios.' });
+  }
+
+  try {
+    // Busca o administrador no banco de dados
+    const admin = await prisma.admin_users.findUnique({ where: { email } });
+
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin não cadastrado.' });
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, admin.senha_hash);
+    if (!senhaCorreta) {
+      return res.status(401).json({ message: 'Senha incorreta.' });
+    }
+
+    const accessToken = jwt.sign(
+      { id: admin.id, email: admin.email, nivel: admin.nivel_acesso },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: '1h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: admin.id, email: admin.email, nivel: admin.nivel_acesso },
+      process.env.REFRESH_TOKEN_SECRET!,
+      { expiresIn: '365d' }
+    );
+
+    return res.status(200).json({
+      message: 'Login administrativo realizado com sucesso.',
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro no login administrativo.' });
+  }
+});
+*/
+
+app.get('/usuarios', async (req: Request, res: Response) => {
+  try {
+    const clientes = await prisma.cliente.findMany({
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        cpf: true,
+        ativo: true,
+        verificado: true,
+        dataRegistro: true,
+        dataNascimento: true,
+        empresas: {
+          select: {
+            id: true,
+            nomeFantasia: true,
+            razaoSocial: true,
+          }
+        },
+        _count: {
+          select: {
+            pedidos: true,
+            avaliacoes: true,
+          }
+        }
+      },
+      orderBy: {
+        dataRegistro: 'desc'
+      }
+    });
+
+    const usuariosFormatados = clientes.map((cliente: any) => ({
+      id: cliente.id,
+      nome: cliente.nome,
+      email: cliente.email,
+      telefone: cliente.telefone,
+      cpf: cliente.cpf,
+      cargo: cliente.empresas.length > 0 ? cliente.empresas[0]?.nomeFantasia : null,
+      status: cliente.ativo ? 'Ativo' as const : 'Inativo' as const,
+      verificado: cliente.verificado,
+      dataJuncao: new Date(cliente.dataRegistro).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      dataNascimento: new Date(cliente.dataNascimento).toLocaleDateString('pt-BR'),
+      totalPedidos: cliente._count.pedidos,
+      totalAvaliacoes: cliente._count.avaliacoes,
+      temEmpresa: cliente.empresas.length > 0,
+      empresa: cliente.empresas.length > 0 ? {
+        id: cliente.empresas[0]?.id || 0,
+        nome: cliente.empresas[0]?.nomeFantasia || '',
+        razaoSocial: cliente.empresas[0]?.razaoSocial || '',
+      } : null
+    }));
+
+    // ✅ USAR sendSuccess em vez de res.status().json()
+    return res.sendSuccess({
+      success: true,
+      usuarios: usuariosFormatados,
+      total: usuariosFormatados.length
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+    // ✅ USAR sendError em vez de res.status().json()
+    return res.sendError('Erro interno do servidor', 500);
+  }
+});
+
+>>>>>>> dev-33
 // 🧍 Cadastro (mantido como estava)
 app.post('/register', async (req: any, res: any) => {
   const { nome, email, senha, telefone, dataNascimento, cpf } = req.body;
