@@ -2,8 +2,10 @@
   "name": "server_ecommerce",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "tsx watch src/http/server.ts",
+    "build": "tsc",
     "format": "prettier --write ."
   },
   "keywords": [],

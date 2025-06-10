@@ -32,7 +32,7 @@ export default function AdminLogin() {
   };
 
   function handleErrorMessage(msg: string) {
-    showToast(msg, { type: 'error', duration: 5000 });
+    showToast(msg, { duration: 5000 });
   }
 
   return (
