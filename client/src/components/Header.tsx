@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 export function Header() {
   const [isLogged, setIsLogged] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const router = useRouter();
 
   const handleSearch = () => {
@@ -23,6 +24,11 @@ export function Header() {
   useEffect(() => {
     if (Cookies.get('refreshToken')) {
       setIsLogged(true);
+    }
+
+    const savedCartItemCount = localStorage.getItem('cartItemCount');
+    if (savedCartItemCount) {
+      setCartItemCount(parseInt(savedCartItemCount, 10));
     }
   }, []);
 
@@ -61,9 +67,14 @@ export function Header() {
         {/* Botão Carrinho */}
         <Link
           href="/cart"
-          className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
+          className="cursor-pointer flex items-center justify-center gap-2 relative"
         >
           <IconShoppingCart size={20} />
+          {cartItemCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              {cartItemCount}
+            </span>
+          )}
         </Link>
 
         {/* Botão Usuário */}

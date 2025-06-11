@@ -78,7 +78,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-
 const isAdminAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.accessToken; // Or however you pass the admin token
 
@@ -89,13 +88,13 @@ const isAdminAuthenticated = async (req: Request, res: Response, next: NextFunct
   try {
     // Ensure you're using the correct secret for admin tokens
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as jwt.JwtPayload;
-    
+
     // Add a check for admin role/level if it's part of your JWT payload
     // For example, if your admin JWT payload includes 'nivel' or 'role':
     // if (decoded.nivel !== 'administrador' && decoded.role !== 'admin') {
     //   return res.sendError('Acesso negado. Permissões insuficientes.', 403);
     // }
-    
+
     // If you store admin users in a separate table and want to verify against it:
     // const adminUser = await prisma.admin_users.findUnique({ where: { id: decoded.id } });
     // if (!adminUser) {
@@ -198,14 +197,16 @@ app.get('/carrossel', async (req: Request, res: Response) => {
 
 // 🛒 Carrinho (mantido como estava)
 app.get('/cart', async (req: Request, res: Response) => {
+  console.log('IDs recebidos:', req.query.ids); // Aqui você vai acessar os IDs através de req.query.ids
+
   try {
-    const idsParam = req.body.ids as string;
+    const idsParam = req.query.ids as string; // Pegando os IDs da query string
     if (!idsParam) {
       return res.sendError("Parâmetro 'ids' não informado.", 400);
     }
 
     const ids = idsParam
-      .split(',')
+      .split(',') // Divida os IDs que são passados como uma string separada por vírgulas
       .map((item) => Number(item))
       .filter((id) => !isNaN(id));
 
@@ -213,15 +214,26 @@ app.get('/cart', async (req: Request, res: Response) => {
       return res.sendError('Nenhum id válido informado.', 400);
     }
 
-    const dummyProducts = ids.map((id) => ({
-      id,
-      nome: `Produto ${id}`,
-      quantidade: Math.floor(Math.random() * 10) + 1,
-      preco: Number((Math.random() * 100).toFixed(2)),
-      imageUrl: `https://picsum.photos/seed/${id}/200/200`,
+    const produtos = await prisma.produto.findMany({
+      where: {
+        id: { in: ids },
+      },
+      include: {
+        Midias: { take: 1 },
+      },
+    });
+
+    const produtosComDetalhes = produtos.map((produto) => ({
+      id: produto.id,
+      nome: produto.nome,
+      preco: produto.preco,
+      precoOriginal: produto.precoOriginal,
+      descricao: produto.descricao,
+      quantidadeVarejo: produto.quantidadeVarejo,
+      imageUrl: produto.Midias[0]?.link || 'default-image-url.jpg',
     }));
 
-    return res.sendSuccess({ products: dummyProducts });
+    return res.sendSuccess({ products: produtosComDetalhes });
   } catch (err) {
     console.error(err);
     return res.sendError('Erro interno no servidor ao listar os produtos.', 500);
@@ -360,7 +372,7 @@ app.post('/create-payment-link', async (req: Request, res: Response) => {
         },
       }
     );
-    console.log(resposta)
+    console.log(resposta);
     const paymentLinkUrl = resposta.data.paymentLinkUrl as string;
     if (!paymentLinkUrl) {
       return res.sendError('Não foi possível obter a URL de pagamento do Asaas.', 500);
@@ -381,7 +393,7 @@ app.post('/webhook', async (req: any, res: any) => {
       );
       return res.sendStatus(401);
     }
-    
+
     const event = req.body as any;
 
     if (
@@ -626,18 +638,18 @@ app.get('/usuarios', async (req: Request, res: Response) => {
             id: true,
             nomeFantasia: true,
             razaoSocial: true,
-          }
+          },
         },
         _count: {
           select: {
             pedidos: true,
             avaliacoes: true,
-          }
-        }
+          },
+        },
       },
       orderBy: {
-        dataRegistro: 'desc'
-      }
+        dataRegistro: 'desc',
+      },
     });
 
     const usuariosFormatados = clientes.map((cliente: any) => ({
@@ -647,33 +659,35 @@ app.get('/usuarios', async (req: Request, res: Response) => {
       telefone: cliente.telefone,
       cpf: cliente.cpf,
       cargo: cliente.empresas.length > 0 ? cliente.empresas[0]?.nomeFantasia : null,
-      status: cliente.ativo ? 'Ativo' as const : 'Inativo' as const,
+      status: cliente.ativo ? ('Ativo' as const) : ('Inativo' as const),
       verificado: cliente.verificado,
       dataJuncao: new Date(cliente.dataRegistro).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       }),
       dataNascimento: new Date(cliente.dataNascimento).toLocaleDateString('pt-BR'),
       totalPedidos: cliente._count.pedidos,
       totalAvaliacoes: cliente._count.avaliacoes,
       temEmpresa: cliente.empresas.length > 0,
-      empresa: cliente.empresas.length > 0 ? {
-        id: cliente.empresas[0]?.id || 0,
-        nome: cliente.empresas[0]?.nomeFantasia || '',
-        razaoSocial: cliente.empresas[0]?.razaoSocial || '',
-      } : null
+      empresa:
+        cliente.empresas.length > 0
+          ? {
+              id: cliente.empresas[0]?.id || 0,
+              nome: cliente.empresas[0]?.nomeFantasia || '',
+              razaoSocial: cliente.empresas[0]?.razaoSocial || '',
+            }
+          : null,
     }));
 
     // ✅ USAR sendSuccess em vez de res.status().json()
     return res.sendSuccess({
       success: true,
       usuarios: usuariosFormatados,
-      total: usuariosFormatados.length
+      total: usuariosFormatados.length,
     });
-
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
     // ✅ USAR sendError em vez de res.status().json()

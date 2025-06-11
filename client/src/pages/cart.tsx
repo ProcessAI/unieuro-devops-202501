@@ -9,15 +9,17 @@ import { apiFetch } from '@/utils/apiClient';
 
 type Product = {
   id: number;
-  image: string;
+  imageUrl: string;
   name: string;
   price: number;
   quantity: number;
+  discountPrice: number;
 };
 
 export default function CartPage() {
   const { showToast } = useToast();
   const [isLogged, setIsLogged] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     if (Cookies.get('refreshToken')) {
@@ -25,59 +27,88 @@ export default function CartPage() {
     }
   }, []);
 
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      image: 'https://http2.mlstatic.com/D_NQ_NP_871755-MLU74346911353_022024-O.webp',
-      name: 'Miniatura W14 Mercedes AMG Petronas F1 2023',
-      price: 999.9,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      image:
-        'https://baggiocafe.com.br/cdn/shop/files/KitEscritorio_Graos__2kg.png?v=1741954451&width=900',
-      name: 'Kit Café Baggio Modo 2kg',
-      price: 50.0,
-      quantity: 3,
-    },
-    {
-      id: 3,
-      image: 'https://m.media-amazon.com/images/I/61lSXM4RsqL._AC_SX569_.jpg',
-      name: 'Mochila Reforçada com Carregador Etsiny',
-      price: 300.0,
-      quantity: 1,
-    },
-    {
-      id: 4,
-      image: 'https://m.media-amazon.com/images/I/710sK2W6R3L._AC_SX522_.jpg',
-      name: 'Caneta Premium de Bambu Planalto LeQualité',
-      price: 110.5,
-      quantity: 1,
-    },
-  ]);
+  useEffect(() => {
+    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (cartItems.length > 0) {
+      fetchProducts(cartItems);
+    }
+  }, []);
+
+  const fetchProducts = async (cartItems: { id: number; quantity: number }[]) => {
+    try {
+      const ids = cartItems.map((item) => item.id).join(',');
+
+      const response = await fetch(`/api/cart?ids=${ids}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        console.error('Erro ao buscar produtos:', response);
+        showToast('Erro ao buscar produtos do carrinho.');
+        return;
+      }
+
+      const data = await response.json();
+
+      const updatedProducts = data.products.map((product: any) => {
+        const cartItem = cartItems.find((item: any) => item.id === product.id);
+
+        const price = parseFloat(product.preco);
+        const discountPrice = price * 0.9;
+
+        return {
+          ...product,
+          price: price,
+          quantity: cartItem?.quantity || 1,
+          discountPrice: discountPrice,
+          imageUrl: product.imageUrl || product.Midias[0]?.link,
+        };
+      });
+
+      setProducts(updatedProducts);
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      showToast('Erro ao carregar os produtos do carrinho.');
+    }
+  };
 
   const handleIncreaseQuantity = (id: number) => {
-    setProducts((prev) =>
-      prev.map((product) =>
+    setProducts((prev) => {
+      const updatedProducts = prev.map((product) =>
         product.id === id ? { ...product, quantity: product.quantity + 1 } : product
-      )
-    );
+      );
+      updateLocalStorage(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const handleDecreaseQuantity = (id: number) => {
-    setProducts((prev) =>
-      prev.map((product) => {
-        if (product.id === id && product.quantity > 1) {
-          return { ...product, quantity: product.quantity - 1 };
-        }
-        return product;
-      })
-    );
+    setProducts((prev) => {
+      const updatedProducts = prev.map((product) =>
+        product.id === id && product.quantity > 1
+          ? { ...product, quantity: product.quantity - 1 }
+          : product
+      );
+      updateLocalStorage(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const handleRemoveProduct = (id: number) => {
-    setProducts((prev) => prev.filter((product) => product.id !== id));
+    setProducts((prev) => {
+      const updatedProducts = prev.filter((product) => product.id !== id);
+      updateLocalStorage(updatedProducts);
+      return updatedProducts;
+    });
+  };
+
+  const updateLocalStorage = (updatedProducts: Product[]) => {
+    const updatedCart = updatedProducts.map((product) => ({
+      id: product.id,
+      quantity: product.quantity,
+    }));
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
   const total = products.reduce((acc, product) => {
@@ -140,7 +171,6 @@ export default function CartPage() {
               <ul className="p-4 space-y-4" aria-label="Lista de itens do carrinho">
                 {products.map((product) => {
                   const hasDiscount = product.quantity >= 3;
-                  const discountPrice = product.price * 0.9;
                   return (
                     <li
                       key={product.id}
@@ -148,7 +178,7 @@ export default function CartPage() {
                     >
                       <div className="flex items-center gap-4">
                         <img
-                          src={product.image}
+                          src={product.imageUrl}
                           alt={product.name}
                           className="w-20 h-20 bg-black rounded-full"
                         />
@@ -159,7 +189,9 @@ export default function CartPage() {
                               <span className="line-through text-gray-400">
                                 R$ {product.price.toFixed(2)}
                               </span>
-                              <span className="text-[#DF9829]">R$ {discountPrice.toFixed(2)}</span>
+                              <span className="text-[#DF9829]">
+                                R$ {product.discountPrice.toFixed(2)}
+                              </span>
                             </div>
                           ) : (
                             <span className="text-gray-400">R$ {product.price.toFixed(2)}</span>
