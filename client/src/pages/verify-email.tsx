@@ -20,7 +20,7 @@ export default function VerifyEmail() {
       return;
     }
 
-    fetch(`http://localhost:3333/verify-email?token=${token}`)
+    fetch(`/api/verify-email?token=${token}`)
       .then(async (res) => {
         const data = await res.json();
         if (res.ok) {
@@ -43,7 +43,7 @@ export default function VerifyEmail() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:3333/resend-verification', {
+      const res = await fetch('/api/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

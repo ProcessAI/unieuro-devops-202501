@@ -35,7 +35,7 @@ export default function Login() {
     if (msg.includes('Conta não validada')) {
       const resend = async () => {
         try {
-          await fetch('http://localhost:3333/resend-verification', {
+          await fetch('/api/resend-verification', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
@@ -129,12 +129,9 @@ export default function Login() {
 
         <p className="mt-6 text-sm text-center text-gray-400">
           Ainda não tem uma conta?{' '}
-        <Link
-          href="/register"
-          className="text-[#DF9829] font-medium hover:underline"
-        >
-          Crie uma conta
-        </Link>
+          <Link href="/register" className="text-[#DF9829] font-medium hover:underline">
+            Crie uma conta
+          </Link>
         </p>
       </div>
     </main>

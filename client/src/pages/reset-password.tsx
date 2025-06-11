@@ -24,7 +24,7 @@ export default function ResetPassword() {
       return;
     }
 
-    fetch(`http://localhost:3333/validate-reset-token?token=${token}`)
+    fetch(`/api/validate-reset-token?token=${token}`)
       .then(async (res) => {
         const data = await res.json();
         if (res.ok) {
@@ -48,7 +48,7 @@ export default function ResetPassword() {
     }
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3333/reset-password', {
+      const res = await fetch('/api/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password: senha }),
@@ -134,7 +134,7 @@ export default function ResetPassword() {
           >
             {loading ? 'Aguarde...' : 'Redefinir Senha'}
           </button>
-                    <p className="mt-6 text-sm text-center text-gray-400">
+          <p className="mt-6 text-sm text-center text-gray-400">
             Lembrou a senha?{' '}
             <Link href="/login" className="text-[#DF9829] font-medium hover:underline">
               Voltar ao login
