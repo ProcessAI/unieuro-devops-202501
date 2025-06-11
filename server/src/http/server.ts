@@ -78,6 +78,59 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+
+const isAdminAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.accessToken; // Or however you pass the admin token
+
+  if (!token) {
+    return res.sendError('Acesso não autorizado.', 401);
+  }
+
+  try {
+    // Ensure you're using the correct secret for admin tokens
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as jwt.JwtPayload;
+    
+    // Add a check for admin role/level if it's part of your JWT payload
+    // For example, if your admin JWT payload includes 'nivel' or 'role':
+    // if (decoded.nivel !== 'administrador' && decoded.role !== 'admin') {
+    //   return res.sendError('Acesso negado. Permissões insuficientes.', 403);
+    // }
+    
+    // If you store admin users in a separate table and want to verify against it:
+    // const adminUser = await prisma.admin_users.findUnique({ where: { id: decoded.id } });
+    // if (!adminUser) {
+    //    return res.sendError('Usuário administrador não encontrado.', 403);
+    // }
+
+    // req.user = decoded; // Attach user info to request if needed later
+    next();
+  } catch (error) {
+    return res.sendError('Token inválido ou expirado.', 403);
+  }
+};
+
+// rota pedido aprovado
+app.get('/admin/pedido-aprovado', isAdminAuthenticated, async (req: Request, res: Response) => {
+  const { pedidoId } = req.body;
+
+  if (!pedidoId) {
+    return res.sendError('ID do pedido não informado.', 400);
+  }
+
+  try {
+    const pedido = await prisma.pedido.update({
+      where: { id: pedidoId },
+      data: { status: 'APROVADO' },
+    });
+
+    return res.sendSuccess({ message: 'Pedido aprovado com sucesso.', pedido });
+  } catch (error) {
+    console.error(error);
+    return res.sendError('Erro ao aprovar o pedido.', 500);
+  }
+});
+// rota pedido aprovado
+
 // ✅ NOVA ROTA: Ofertas do Dia
 app.get('/ofertas', async (req: Request, res: Response) => {
   try {

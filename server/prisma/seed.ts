@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -228,6 +229,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
     ],
+    skipDuplicates: true,
   });
 
   // Produtos de Moda
@@ -236,8 +238,8 @@ async function main() {
       {
         nome: 'Jaqueta Jeans Masculina Slim',
         descricao: 'Jaqueta jeans com corte slim e lavagem moderna',
-        preco: 179.90,
-        precoOriginal: 229.90,
+        preco: 179.9,
+        precoOriginal: 229.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -255,8 +257,8 @@ async function main() {
       {
         nome: 'Vestido Longo Floral Feminino',
         descricao: 'Vestido leve e elegante, ideal para o verão',
-        preco: 139.90,
-        precoOriginal: 169.90,
+        preco: 139.9,
+        precoOriginal: 169.9,
         frete: 18,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -274,8 +276,8 @@ async function main() {
       {
         nome: 'Tênis Esportivo Unissex Corrida Pro',
         descricao: 'Tênis leve com amortecimento para corrida e academia',
-        preco: 249.90,
-        precoOriginal: 299.90,
+        preco: 249.9,
+        precoOriginal: 299.9,
         frete: 24,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -293,8 +295,8 @@ async function main() {
       {
         nome: 'Blusa Canelada Gola Alta Feminina',
         descricao: 'Blusa elegante com tecido confortável',
-        preco: 69.90,
-        precoOriginal: 89.90,
+        preco: 69.9,
+        precoOriginal: 89.9,
         frete: 12,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -312,8 +314,8 @@ async function main() {
       {
         nome: 'Camisa Social Masculina Slim Fit',
         descricao: 'Camisa elegante com tecido de alta qualidade',
-        preco: 119.90,
-        precoOriginal: 149.90,
+        preco: 119.9,
+        precoOriginal: 149.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -331,8 +333,8 @@ async function main() {
       {
         nome: 'Calça Jeans Skinny Feminina',
         descricao: 'Modelagem que valoriza a silhueta com elastano',
-        preco: 129.90,
-        precoOriginal: 159.90,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 16,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -350,8 +352,8 @@ async function main() {
       {
         nome: 'Casaco Moletom Masculino com Capuz',
         descricao: 'Ideal para dias frios com bolso frontal',
-        preco: 99.90,
-        precoOriginal: 129.90,
+        preco: 99.9,
+        precoOriginal: 129.9,
         frete: 20,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -369,8 +371,8 @@ async function main() {
       {
         nome: 'Óculos de Sol Estilo Aviador UV400',
         descricao: 'Proteção total contra raios UV e visual moderno',
-        preco: 79.90,
-        precoOriginal: 109.90,
+        preco: 79.9,
+        precoOriginal: 109.9,
         frete: 10,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -388,8 +390,8 @@ async function main() {
       {
         nome: 'Bolsa Feminina Transversal Couro Sintético',
         descricao: 'Compacta, elegante e prática para o dia a dia',
-        preco: 109.90,
-        precoOriginal: 139.90,
+        preco: 109.9,
+        precoOriginal: 139.9,
         frete: 14,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -407,8 +409,8 @@ async function main() {
       {
         nome: 'Relógio Digital Masculino Esportivo',
         descricao: 'Resistente à água, com cronômetro e luz de LED',
-        preco: 89.90,
-        precoOriginal: 119.90,
+        preco: 89.9,
+        precoOriginal: 119.9,
         frete: 11,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -423,10 +425,9 @@ async function main() {
         quantidade: 75,
         quantidadeVarejo: 2,
       },
-
     ],
+    skipDuplicates: true,
   });
-
 
   // Produtos de Casa e Decoração
   await prisma.produto.createMany({
@@ -434,8 +435,8 @@ async function main() {
       {
         nome: 'Luminária de Mesa Vintage',
         descricao: 'Luminária com design retrô e luz regulável',
-        preco: 149.90,
-        precoOriginal: 189.90,
+        preco: 149.9,
+        precoOriginal: 189.9,
         frete: 20,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -453,8 +454,8 @@ async function main() {
       {
         nome: 'Conjunto de Almofadas Decorativas 4 Peças',
         descricao: 'Almofadas com estampas modernas e confortáveis',
-        preco: 99.90,
-        precoOriginal: 129.90,
+        preco: 99.9,
+        precoOriginal: 129.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -472,8 +473,8 @@ async function main() {
       {
         nome: 'Vaso Cerâmico Branco',
         descricao: 'Vaso elegante para plantas ou decoração',
-        preco: 79.90,
-        precoOriginal: 99.90,
+        preco: 79.9,
+        precoOriginal: 99.9,
         frete: 18,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -491,8 +492,8 @@ async function main() {
       {
         nome: 'Relógio de Parede Minimalista',
         descricao: 'Relógio moderno com design clean e silencioso',
-        preco: 129.90,
-        precoOriginal: 159.90,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 20,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -510,8 +511,8 @@ async function main() {
       {
         nome: 'Castiçal de Metal Dourado',
         descricao: 'Castiçal elegante para velas decorativas',
-        preco: 59.90,
-        precoOriginal: 79.90,
+        preco: 59.9,
+        precoOriginal: 79.9,
         frete: 12,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -529,8 +530,8 @@ async function main() {
       {
         nome: 'Tapete Decorativo',
         descricao: 'Tapete macio com design geométrico moderno',
-        preco: 299.90,
-        precoOriginal: 349.90,
+        preco: 299.9,
+        precoOriginal: 349.9,
         frete: 40,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -548,8 +549,8 @@ async function main() {
       {
         nome: 'Espelho Decorativo Redondo',
         descricao: 'Espelho com moldura dourada para sala ou quarto',
-        preco: 199.90,
-        precoOriginal: 249.90,
+        preco: 199.9,
+        precoOriginal: 249.9,
         frete: 30,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -567,8 +568,8 @@ async function main() {
       {
         nome: 'Cortina Blackout',
         descricao: 'Cortina bloqueia luz, ideal para quartos',
-        preco: 249.90,
-        precoOriginal: 299.90,
+        preco: 249.9,
+        precoOriginal: 299.9,
         frete: 35,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -586,8 +587,8 @@ async function main() {
       {
         nome: 'Prateleira Flutuante',
         descricao: 'Prateleira em MDF para organização e decoração',
-        preco: 129.90,
-        precoOriginal: 159.90,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 25,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -605,8 +606,8 @@ async function main() {
       {
         nome: 'Jogo de Taças Cristal 6 Peças',
         descricao: 'Conjunto elegante para ocasiões especiais',
-        preco: 179.90,
-        precoOriginal: 219.90,
+        preco: 179.9,
+        precoOriginal: 219.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -622,9 +623,10 @@ async function main() {
         quantidadeVarejo: 1,
       },
     ],
+    skipDuplicates: true,
   });
 
-   // Produtos de Beleza
+  // Produtos de Beleza
   await prisma.produto.createMany({
     data: [
       {
@@ -649,8 +651,8 @@ async function main() {
       {
         nome: 'Prancha Alisadora Nano Titanium',
         descricao: 'Alisa com precisão e brilho, indicada para todos os tipos de cabelo',
-        preco: 279.90,
-        precoOriginal: 319.90,
+        preco: 279.9,
+        precoOriginal: 319.9,
         frete: 25,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -687,8 +689,8 @@ async function main() {
       {
         nome: 'Kit Skincare Completo',
         descricao: 'Limpeza, hidratação e tonificação com produtos dermatologicamente testados',
-        preco: 139.90,
-        precoOriginal: 169.90,
+        preco: 139.9,
+        precoOriginal: 169.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -706,8 +708,8 @@ async function main() {
       {
         nome: 'Aparador de Pelos Facial Recarregável',
         descricao: 'Remoção delicada de pelos com acabamento suave e indolor',
-        preco: 89.90,
-        precoOriginal: 119.90,
+        preco: 89.9,
+        precoOriginal: 119.9,
         frete: 12,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -744,8 +746,8 @@ async function main() {
       {
         nome: 'Depilador Elétrico Feminino',
         descricao: 'Depilação suave e eficaz com tecnologia de proteção da pele',
-        preco: 129.90,
-        precoOriginal: 159.90,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 16,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -782,8 +784,8 @@ async function main() {
       {
         nome: 'Creme Antissinais com Retinol 50g',
         descricao: 'Reduz linhas de expressão e hidrata profundamente',
-        preco: 59.90,
-        precoOriginal: 79.90,
+        preco: 59.9,
+        precoOriginal: 79.9,
         frete: 10,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -801,8 +803,8 @@ async function main() {
       {
         nome: 'Escova de Cabelo Anti-Frizz',
         descricao: 'Escova alisadora com tecnologia para anti-frizz',
-        preco: 189.90,
-        precoOriginal: 229.90,
+        preco: 189.9,
+        precoOriginal: 229.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -818,174 +820,119 @@ async function main() {
         quantidadeVarejo: 1,
       },
     ],
+    skipDuplicates: true,
   });
 
   await prisma.midia.createMany({
     data: [
-      {
-        link: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
-        produtoId: 1,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12',
-        produtoId: 2,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1640&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 3,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 4,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 5,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 6,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1636569826709-8e07f6104992?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 7,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=1684&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 8,
-      },
-      {
-        link: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/PlayStation_5_and_DualSense.jpg/500px-PlayStation_5_and_DualSense.jpg?20201130152557',
-        produtoId: 9,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 10,
-      },
-         {
-        link: 'https://images.unsplash.com/photo-1549108949-89cd83414d5a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 11,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1658955924468-a4ee5fa6aeb6?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 12,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1559743345-60e0907c4853?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 13,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1597582927786-bae43be837a0?q=80&w=1885&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 14,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1656453260540-268a06c29c73?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 15,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1665816152071-4cccdeeb1583?q=80&w=1664&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 16,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1678740268643-aa5777c2f16d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 17,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1653038282392-bbca5f8a3f0d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 18,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1575384938813-188de2f81d1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 19,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1733570890170-49be2550189b?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 20,
-      },
-      {
-        link: 'https://plus.unsplash.com/premium_photo-1715890451731-dc7e87984313?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 21,
-      },
-      {
-        link: 'https://plus.unsplash.com/premium_photo-1682310316833-578612b07de7?q=80&w=1812&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 22,
-      },
-      {
-        link: 'https://plus.unsplash.com/premium_photo-1681449855827-295c626f7b84?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 23,
-      },
-      {
-        link: 'https://plus.unsplash.com/premium_photo-1664391827302-9d821c39762b?q=80&w=1643&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 24,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1648115315559-620fb2f655aa?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 25,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1576173478758-2ada6f4aa9e2?q=80&w=1833&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 26,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1688731789548-d48e75c02894?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 27,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1660958639203-cbc9bb56955b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 28,
-      },
-      {
-        link: 'https://plus.unsplash.com/premium_photo-1739612422471-856ba749b780?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 29,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1694445482967-f3024c92852d?q=80&w=1682&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 30,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1522338140262-f46f5913618a?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 31,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1560869713-7d0a29430803?q=80&w=1826&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 32,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1711454867327-4990937f8f18?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 33,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 34,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1710839006592-4fdfc6caca80?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 35,
-      },
-      {
-        link: 'https://plus.unsplash.com/premium_photo-1661576924581-a2a6c614f53b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 36,
-      },
-      {
-        link: 'https://images.pexels.com/photos/10359950/pexels-photo-10359950.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        produtoId: 37,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1602532381225-eec578361933?q=80&w=1630&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 38,
-      },
-      {
-        link: 'https://images.pexels.com/photos/5264269/pexels-photo-5264269.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        produtoId: 39,
-      },
-      {
-        link: 'https://images.unsplash.com/photo-1703353288357-c7efb9e6573a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        produtoId: 40,
-      },
+      { link: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', produtoId: 1 },
+      { link: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12', produtoId: 2 },
+      { link: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1640&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 3 },
+      { link: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 4 },
+      { link: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 5 },
+      { link: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 6 },
+      { link: 'https://images.unsplash.com/photo-1636569826709-8e07f6104992?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 7 },
+      { link: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=1684&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 8 },
+      { link: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/PlayStation_5_and_DualSense.jpg/500px-PlayStation_5_and_DualSense.jpg?20201130152557', produtoId: 9 },
+      { link: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 10 },
+      { link: 'https://images.unsplash.com/photo-1549108949-89cd83414d5a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 11 },
+      { link: 'https://images.unsplash.com/photo-1658955924468-a4ee5fa6aeb6?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 12 },
+      { link: 'https://images.unsplash.com/photo-1559743345-60e0907c4853?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 13 },
+      { link: 'https://images.unsplash.com/photo-1597582927786-bae43be837a0?q=80&w=1885&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 14 },
+      { link: 'https://images.unsplash.com/photo-1656453260540-268a06c29c73?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 15 },
+      { link: 'https://images.unsplash.com/photo-1665816152071-4cccdeeb1583?q=80&w=1664&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 16 },
+      { link: 'https://images.unsplash.com/photo-1678740268643-aa5777c2f16d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 17 },
+      { link: 'https://images.unsplash.com/photo-1653038282392-bbca5f8a3f0d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 18 },
+      { link: 'https://images.unsplash.com/photo-1575384938813-188de2f81d1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 19 },
+      { link: 'https://images.unsplash.com/photo-1733570890170-49be2550189b?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 20 },
+      { link: 'https://plus.unsplash.com/premium_photo-1715890451731-dc7e87984313?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 21 },
+      { link: 'https://plus.unsplash.com/premium_photo-1682310316833-578612b07de7?q=80&w=1812&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 22 },
+      { link: 'https://plus.unsplash.com/premium_photo-1681449855827-295c626f7b84?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 23 },
+      { link: 'https://plus.unsplash.com/premium_photo-1664391827302-9d821c39762b?q=80&w=1643&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 24 },
+      { link: 'https://images.unsplash.com/photo-1648115315559-620fb2f655aa?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 25 },
+      { link: 'https://images.unsplash.com/photo-1576173478758-2ada6f4aa9e2?q=80&w=1833&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 26 },
+      { link: 'https://images.unsplash.com/photo-1688731789548-d48e75c02894?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 27 },
+      { link: 'https://images.unsplash.com/photo-1660958639203-cbc9bb56955b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 28 },
+      { link: 'https://plus.unsplash.com/premium_photo-1739612422471-856ba749b780?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 29 },
+      { link: 'https://images.unsplash.com/photo-1694445482967-f3024c92852d?q=80&w=1682&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 30 },
+      { link: 'https://images.unsplash.com/photo-1522338140262-f46f5913618a?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 31 },
+      { link: 'https://images.unsplash.com/photo-1560869713-7d0a29430803?q=80&w=1826&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 32 },
+      { link: 'https://images.unsplash.com/photo-1711454867327-4990937f8f18?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 33 },
+      { link: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 34 },
+      { link: 'https://images.unsplash.com/photo-1710839006592-4fdfc6caca80?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 35 },
+      { link: 'https://plus.unsplash.com/premium_photo-1661576924581-a2a6c614f53b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 36 },
+      { link: 'https://images.pexels.com/photos/10359950/pexels-photo-10359950.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', produtoId: 37 },
+      { link: 'https://images.unsplash.com/photo-1602532381225-eec578361933?q=80&w=1630&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 38 },
+      { link: 'https://images.pexels.com/photos/5264269/pexels-photo-5264269.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', produtoId: 39 },
+      { link: 'https://images.unsplash.com/photo-1703353288357-c7efb9e6573a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', produtoId: 40 },
     ],
+    skipDuplicates: true,
   });
 
-  console.log('Seed finalizado com sucesso!');
+  console.log('Seed de Categorias, Marcas, Produtos e Mídias finalizado.');
+
+  // Cria um cliente para associar aos pedidos
+  const saltRounds = 10;
+  const passwordHash = await bcrypt.hash('senha123', saltRounds);
+
+  const cliente = await prisma.cliente.upsert({
+    where: { email: 'joao.silva@example.com' },
+    update: {},
+    create: {
+      nome: 'João Silva',
+      email: 'joao.silva@example.com',
+      telefone: '11987654321',
+      senha: passwordHash,
+      dataNascimento: new Date('1990-01-15T00:00:00Z'),
+      cpf: '12345678901',
+      ativo: true,
+      verificado: true, // Já cria como verificado para simplificar
+    },
+  });
+
+  // Busca produtos para usar nos pedidos
+  const produto1 = await prisma.produto.findUnique({ where: { id: 1 } });
+  const produto11 = await prisma.produto.findUnique({ where: { id: 11 } });
+
+  if (!produto1 || !produto11) {
+    console.error('Produtos de exemplo não encontrados. Certifique-se de que os produtos com ID 1 e 11 existem.');
+    return;
+  }
+
+  // Cria Pedidos
+  await prisma.pedido.createMany({
+    data: [
+      {
+        quantidade: 1,
+        clienteId: cliente.id,
+        dataCompra: new Date('2025-05-10T10:00:00Z'),
+        produtoId: produto1.id,
+        formaPagamento: 'Cartão de Crédito',
+        status: 'Entregue',
+        valorPago: produto1.preco,
+        dataEntrega: new Date('2025-05-15T18:00:00Z'),
+        notaFiscal: 'NF-00001',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
+        assinado: 'João Silva',
+      },
+      {
+        quantidade: 2,
+        clienteId: cliente.id,
+        dataCompra: new Date('2025-06-01T14:30:00Z'),
+        produtoId: produto11.id,
+        formaPagamento: 'Pix',
+        status: 'Enviado',
+        valorPago: Number(produto11.preco) * 2,
+        dataEntrega: new Date('2025-06-10T18:00:00Z'), // Entrega estimada
+        notaFiscal: 'NF-00002',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
+        assinado: 'Não assinado',
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log('Cliente e Pedidos semeados com sucesso!');
 }
 
 main()
