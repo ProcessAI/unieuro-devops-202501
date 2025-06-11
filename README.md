@@ -96,9 +96,10 @@ DATABASE_URL="postgresql://postgres:docker@localhost:15432/localhost?schema=publ
 ```bash
 cd server
 npm install
-npx prisma generate
 # abra o docker na sua maquina para evitar erros
 docker-compose up -d  # inicia PostgreSQL
+npx prisma generate
+npx prisma migrate dev
 npm run dev
 ```
 
