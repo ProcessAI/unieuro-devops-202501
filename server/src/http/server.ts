@@ -61,7 +61,7 @@ async function sendResetPasswordEmail(email: string, token: string) {
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://atacanet.com.br'],
     credentials: true,
   })
 );
