@@ -14,6 +14,7 @@ const publicRoutes = [
   { path: '/forgot-password', whenAuthenticated: 'redirect' },
   { path: /^\/reset-password(?:\/.*)?$/, whenAuthenticated: 'redirect' },
   { path: '/pricing', whenAuthenticated: 'next' },
+  { path: '/dashboard', whenAuthenticated: 'next' },
   { path: '/', whenAuthenticated: 'next' },
   { path: '/product-search', whenAuthenticated: 'next' },
   { path: '/product', whenAuthenticated: 'next' },
