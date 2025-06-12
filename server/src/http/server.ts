@@ -32,7 +32,10 @@ const transporter = nodemailer.createTransport({
 async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
   await transporter.sendMail({
-    from: '"Atacanet" <' + process.env.SMTP_FROM + '>',
+    from: {
+      name: 'Atacanet',
+      address: process.env.SMTP_FROM!,
+    },
     to: email,
     subject: 'Valide seu e-mail',
     html: `
@@ -47,7 +50,10 @@ async function sendVerificationEmail(email: string, token: string) {
 async function sendResetPasswordEmail(email: string, token: string) {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
   await transporter.sendMail({
-    from: '"Atacanet" <' + process.env.SMTP_FROM + '>',
+    from: {
+      name: 'Atacanet',
+      address: process.env.SMTP_FROM!,
+    },
     to: email,
     subject: 'Redefinição de senha',
     html: `
@@ -454,7 +460,10 @@ app.post('/webhook', async (req: any, res: any) => {
 
       const clienteEmail = pedidoRegistro.Cliente.email;
       const mailOptions = {
-        from: '"Atacanet" <' + process.env.SMTP_FROM + '>',
+        from: {
+          name: 'Atacanet',
+          address: process.env.SMTP_FROM!,
+        },
         to: clienteEmail,
         subject: `Sua nota fiscal - Pedido ${externalRef}`,
         html: `
