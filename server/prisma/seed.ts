@@ -905,6 +905,9 @@ async function main() {
   // Busca produtos para usar nos pedidos
   const produto1 = await prisma.produto.findUnique({ where: { id: 1 } });
   const produto11 = await prisma.produto.findUnique({ where: { id: 11 } });
+  const produto19 = await prisma.produto.findUnique({ where: { id: 19 } });
+  const produto22 = await prisma.produto.findUnique({ where: { id: 22 } });
+  const produto31 = await prisma.produto.findUnique({ where: { id: 31 } });
 
   if (!produto1 || !produto11) {
     console.error('Produtos de exemplo não encontrados. Certifique-se de que os produtos com ID 1 e 11 existem.');
@@ -932,10 +935,10 @@ async function main() {
         quantidade: 2,
         clienteId: cliente.id,
         dataCompra: new Date('2025-06-11T14:00:00Z'),
-        produtoId: produto1.id,
+        produtoId: produto22.id,
         formaPagamento: 'Pix',
         status: 'pago',
-        valorPago: Number(produto1.preco) * 2,
+        valorPago: Number(produto22.preco) * 2,
         dataEntrega: new Date('2025-06-15T18:00:00Z'),
         notaFiscal: 'NF-10002',
         dataDevolucao: new Date('9999-12-31T23:59:59Z'),
@@ -945,10 +948,10 @@ async function main() {
         quantidade: 1,
         clienteId: cliente.id,
         dataCompra: new Date('2025-06-13T16:45:00Z'),
-        produtoId: produto1.id,
+        produtoId: produto31.id,
         formaPagamento: 'Boleto',
         status: 'pago',
-        valorPago: produto1.preco,
+        valorPago: produto31.preco,
         dataEntrega: new Date('2025-06-16T18:00:00Z'),
         notaFiscal: 'NF-10003',
         dataDevolucao: new Date('9999-12-31T23:59:59Z'),
@@ -973,10 +976,10 @@ async function main() {
         quantidade: 2,
         clienteId: cliente.id,
         dataCompra: new Date('2025-05-28T13:15:00Z'),
-        produtoId: produto1.id,
+        produtoId: produto19.id,
         formaPagamento: 'Cartão de Débito',
         status: 'pago',
-        valorPago: Number(produto1.preco) * 2,
+        valorPago: Number(produto19.preco) * 2,
         dataEntrega: new Date('2025-06-02T18:00:00Z'),
         notaFiscal: 'NF-10005',
         dataDevolucao: new Date('9999-12-31T23:59:59Z'),

@@ -579,7 +579,110 @@ app.get('/dashboard/estatisticas', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/dashboard/vendas-mensais', async (req, res) => {
+  const agora = new Date();
+  const anoAtual = agora.getFullYear();
 
+  try {
+    const pedidos = await prisma.pedido.findMany({
+      where: {
+        dataCompra: {
+          gte: new Date(`${anoAtual}-01-01T00:00:00Z`),
+          lte: new Date(`${anoAtual}-12-31T23:59:59Z`),
+        },
+      },
+      select: {
+        dataCompra: true,
+        valorPago: true,
+      },
+    });
+
+    const vendasPorMes = Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(anoAtual, i).toLocaleString('pt-BR', { month: 'short' }),
+      value: 0,
+    }));
+
+    for (const pedido of pedidos) {
+      const mes = new Date(pedido.dataCompra).getMonth();
+      vendasPorMes[mes].value += Number(pedido.valorPago);
+    }
+
+    res.status(200).json({ vendas: vendasPorMes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erro ao carregar vendas mensais.' });
+  }
+});
+
+app.get('/dashboard/categorias-vendas', async (req, res) => {
+  // -----------------------------------------------------------
+  // 1. Período de busca
+  // -----------------------------------------------------------
+  const filtro = (req.query.filtro as string) ?? 'mes';
+  const agora   = new Date();
+  let inicio: Date;
+  let fim   : Date;
+
+  switch (filtro) {
+    case 'dia': {             // hoje
+      inicio = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
+      fim    = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 23, 59, 59);
+      break;
+    }
+    case 'semana': {          // segunda-feira 00:00 → domingo 23:59
+      // getDay(): 0=domingo … 6=sábado  → converte para ISO (segunda=0)
+      const diaSemana = (agora.getDay() + 6) % 7;         // 0-6
+      inicio = new Date(agora);
+      inicio.setDate(agora.getDate() - diaSemana);        // volta até segunda
+      inicio.setHours(0, 0, 0, 0);
+
+      fim = new Date(inicio);
+      fim.setDate(inicio.getDate() + 6);                  // domingo
+      fim.setHours(23, 59, 59, 999);
+      break;
+    }
+    case 'ano': {            // primeiro → último dia do ano
+      inicio = new Date(agora.getFullYear(), 0, 1, 0, 0, 0);
+      fim    = new Date(agora.getFullYear(), 11, 31, 23, 59, 59);
+      break;
+    }
+    default: {               // 'mes' (padrão)
+      inicio = new Date(agora.getFullYear(), agora.getMonth(), 1, 0, 0, 0);
+      fim    = new Date(agora.getFullYear(), agora.getMonth() + 1, 0, 23, 59, 59);
+    }
+  }
+
+  try {
+    const agrupado = await prisma.pedido.groupBy({
+      where: { dataCompra: { gte: inicio, lte: fim } },
+      by   : ['produtoId'],
+      _sum : { quantidade: true },
+    });
+
+    const produtos = await prisma.produto.findMany({
+      where  : { id: { in: agrupado.map((v) => v.produtoId) } },
+      include: { Categoria: { select: { nome: true } } },
+    });
+
+    const somaPorCategoria = new Map<string, number>();
+
+    for (const venda of agrupado) {
+      const produto       = produtos.find((p) => p.id === venda.produtoId);
+      const categoriaNome = produto?.Categoria?.nome;
+      if (!categoriaNome) continue;
+
+      const atual = somaPorCategoria.get(categoriaNome) || 0;
+      somaPorCategoria.set(categoriaNome, atual + (venda._sum.quantidade || 0));
+    }
+
+    const resultado = Array.from(somaPorCategoria, ([name, value]) => ({ name, value }));
+
+    res.status(200).json(resultado);
+  } catch (err) {
+    console.error('Erro ao buscar categorias mais vendidas:', err);
+    res.status(500).json({ message: 'Erro ao buscar categorias mais vendidas.' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

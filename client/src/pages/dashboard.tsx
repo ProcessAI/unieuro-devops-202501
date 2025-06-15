@@ -4,7 +4,7 @@ import StatsCard from '../components/StatsCard';
 import LineChart from '../components/LineChart';
 import PieChart from '../components/PieChart';
 import OrdersTable from '../components/OrdersTable';
-import { BanknoteArrowUp, Package, Users, Handshake } from 'lucide-react';
+import { BanknoteArrowUp, Package } from 'lucide-react';
 
 const Dashboard = ({ stats }) => {
   if (!stats) return <p className="text-white">Erro ao carregar dados do dashboard.</p>;
@@ -42,7 +42,7 @@ const Dashboard = ({ stats }) => {
             })}
             percentage="↑ 2% esse mês"
             isPositive={true}
-            icon={<Users />}
+            icon={<BanknoteArrowUp />}
           />
 
           <StatsCard
@@ -50,7 +50,7 @@ const Dashboard = ({ stats }) => {
             value={stats.pedidosMes.toString()}
             percentage="↑ 7% esse mês"
             isPositive={true}
-            icon={<Handshake />}
+            icon={<Package />}
           />
         </div>
 
