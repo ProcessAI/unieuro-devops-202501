@@ -12,6 +12,7 @@ const publicRoutes = [
   { path: '/product-search', whenAuthenticated: 'next' },
   { path: /^\/product\//, whenAuthenticated: 'next' },
   { path: /^\/pedido\//, whenAuthenticated: 'next' },
+  // { path: "/admin/aprove-orders", whenAuthenticated: "next" },
   { path: /^\/verify-email(?:\/.*)?$/, whenAuthenticated: 'next' },
 ];
 
