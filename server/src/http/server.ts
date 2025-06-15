@@ -518,6 +518,69 @@ app.get('/produto/:id', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/dashboard/estatisticas', async (req: Request, res: Response) => {
+  try {
+    const hoje = new Date();
+    const umaSemanaAtras = new Date();
+    umaSemanaAtras.setDate(hoje.getDate() - 7);
+
+    const umMesAtras = new Date();
+    umMesAtras.setMonth(hoje.getMonth() - 1);
+
+    const [vendasSemana, pedidosSemana, vendasMes, pedidosMes] = await Promise.all([
+      prisma.pedido.aggregate({
+        _sum: { valorPago: true },
+        where: {
+          dataCompra: {
+            gte: umaSemanaAtras,
+            lte: hoje,
+          },
+        },
+      }),
+
+      prisma.pedido.count({
+        where: {
+          dataCompra: {
+            gte: umaSemanaAtras,
+            lte: hoje,
+          },
+        },
+      }),
+
+      prisma.pedido.aggregate({
+        _sum: { valorPago: true },
+        where: {
+          dataCompra: {
+            gte: umMesAtras,
+            lte: hoje,
+          },
+        },
+      }),
+
+      prisma.pedido.count({
+        where: {
+          dataCompra: {
+            gte: umMesAtras,
+            lte: hoje,
+          },
+        },
+      }),
+    ]);
+
+    res.sendSuccess({
+      vendasSemana: Number(vendasSemana._sum.valorPago || 0),
+      pedidosSemana,
+      vendasMes: Number(vendasMes._sum.valorPago || 0),
+      pedidosMes,
+    });
+  } catch (err) {
+    console.error(err);
+    res.sendError('Erro ao carregar estatísticas do dashboard.', 500);
+  }
+});
+
+
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
