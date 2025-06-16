@@ -368,8 +368,8 @@ app.post('/create-payment-link', async (req: Request, res: Response) => {
       returnUrl: `${process.env.FRONTEND_URL}/order-confirmation`,
     };
     const resposta = await axios.post(
-      // 'https://www.asaas.com/v3/paymentLinks',
-      'https://api-sandbox.asaas.com/v3/paymentLinks',
+      'https://www.asaas.com/v3/paymentLinks',
+      // 'https://api-sandbox.asaas.com/v3/paymentLinks',
       payloadAsaas,
       {
         headers: {
@@ -445,8 +445,8 @@ app.post('/webhook', async (req: any, res: any) => {
       };
 
       const invoiceResponse = await axios.post(
-        // 'https://www.asaas.com/api/v3/invoices',
-        'https://api-sandbox.asaas.com/api/v3/invoices',
+        'https://www.asaas.com/api/v3/invoices',
+        // 'https://api-sandbox.asaas.com/api/v3/invoices',
         invoicePayload,
         {
           headers: {
