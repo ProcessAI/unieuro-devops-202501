@@ -274,31 +274,30 @@ app.post('/checkout', async (req: Request, res: Response) => {
 });
 
 app.post('/create-payment-link', async (req: Request, res: Response) => {
+  let pedidoId: number | null = null; 
   try {
     let token = '';
     const authHeader = String(req.headers.authorization || '');
     if (authHeader.startsWith('Bearer ')) {
       token = authHeader.replace(/^Bearer\s+/, '').trim();
-    } else if (req.cookies && req.cookies.accessToken) {
+    } else if (req.cookies?.accessToken) {
       token = String(req.cookies.accessToken);
     } else {
       return res.sendError('Token de autenticação não fornecido.', 401);
     }
-
     let payload: any;
     try {
       payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
     } catch {
       return res.sendError('Token inválido ou expirado.', 401);
     }
-
     const userId = Number(payload.id);
     if (!userId) {
-      return res.sendError('Token é necessário para esta requisição.', 401);
+      return res.sendError('Token não contém ID de usuário.', 401);
     }
 
     const { products, paymentMethod } = req.body as {
-      products: Array<{ id: number; quantity: number }>;
+      products: { id: number; quantity: number }[];
       paymentMethod: 'pix' | 'card' | 'boleto';
     };
     if (!Array.isArray(products) || products.length === 0) {
@@ -307,86 +306,97 @@ app.post('/create-payment-link', async (req: Request, res: Response) => {
     if (!billingTypeMap[paymentMethod]) {
       return res.sendError('paymentMethod inválido. Use "pix", "card" ou "boleto".', 400);
     }
+
     const productIds = products.map((p) => p.id);
     const produtosDoBanco = await prisma.produto.findMany({
       where: { id: { in: productIds } },
-      select: {
-        id: true,
-        nome: true,
-        preco: true,
-        precoOriginal: true,
-        quantidadeVarejo: true,
-      },
+      select: { id: true, nome: true, preco: true, precoOriginal: true, quantidadeVarejo: true },
     });
     if (produtosDoBanco.length === 0) {
       return res.sendError('Nenhum produto válido encontrado pelo ID.', 400);
     }
-    const mapaProdutos = new Map<
-      number,
-      {
-        nome: string;
-        preco: number;
-        precoOriginal: number;
-        quantidadeVarejo: number;
-      }
-    >();
-    produtosDoBanco.forEach((p: any) => {
-      mapaProdutos.set(p.id, {
-        nome: p.nome,
-        preco: Number(p.preco.toString()),
-        precoOriginal: Number(p.precoOriginal.toString()),
-        quantidadeVarejo: p.quantidadeVarejo,
-      });
-    });
+    const mapa = new Map<number, { nome: string; preco: number }>();
+    produtosDoBanco.forEach((p) =>
+      mapa.set(p.id, { nome: p.nome, preco: Number(p.preco.toString()) })
+    );
+
     let valorTotal = 0;
     const descricaoItens: string[] = [];
     for (const item of products) {
-      const dados = mapaProdutos.get(item.id);
-      if (!dados) {
-        return res.sendError(`Produto de ID ${item.id} não encontrado no banco.`, 400);
+      const info = mapa.get(item.id);
+      if (!info) {
+        return res.sendError(`Produto de ID ${item.id} não encontrado.`, 400);
       }
-      let unitPrice = dados.preco;
-      if (item.quantity >= 3) {
-        unitPrice = dados.preco * 0.9;
-      }
+      let unitPrice = info.preco;
+      if (item.quantity >= 3) unitPrice *= 0.9;
       const subTotal = unitPrice * item.quantity;
       valorTotal += subTotal;
-      descricaoItens.push(`${dados.nome} (x${item.quantity}) → R$ ${subTotal.toFixed(2)}`);
+      descricaoItens.push(`${info.nome} (x${item.quantity}) → R$ ${subTotal.toFixed(2)}`);
     }
     const valorTotalStr = valorTotal.toFixed(2);
-    const agora = new Date();
-    const venc = new Date(agora.getTime() + 24 * 60 * 60 * 1000);
-    const yyyy = venc.getFullYear();
-    const mm = String(venc.getMonth() + 1).padStart(2, '0');
-    const dd = String(venc.getDate()).padStart(2, '0');
-    const dueDate = `${yyyy}-${mm}-${dd}`;
-    const payloadAsaas = {
+
+    const novoPedido = await prisma.pedido.create({
+      data: {
+        clienteId: userId,
+        quantidade: products.reduce((sum, i) => sum + i.quantity, 0),
+        formaPagamento: paymentMethod,
+        status: 'PENDENTE',
+        valorPago: 0,
+        dataCompra: new Date(),
+        produtoId: productIds[0],
+      },
+    });
+    const pedidoId = novoPedido.id;
+
+    const payloadAsaas: any = {
+      name: `AtacaNet – Pedido #${pedidoId}`,
+      description: `Pedido #${pedidoId}\n${descricaoItens.join('\n')}`,
+      value: Number(valorTotalStr),
       billingType: billingTypeMap[paymentMethod],
-      value: valorTotalStr,
-      dueDate,
-      description: `Compra no AtacaNet:\n${descricaoItens.join('\n')}`,
-      returnUrl: `${process.env.FRONTEND_URL}/order-confirmation`,
+      chargeType: 'DETACHED',
+      callback: {
+        successUrl: `${process.env.FRONTEND_URL}/order-confirmation`,
+        autoRedirect: true,
+      },
     };
-    const resposta = await axios.post(
-      'https://api.asaas.com/v3/paymentLinks',
-      // 'https://api-sandbox.asaas.com/v3/paymentLinks',
-      payloadAsaas,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          access_token: process.env.ASAAS_API_KEY!,
-        },
-      }
-    );
-    console.log(resposta);
-    const paymentLinkUrl = resposta.data.paymentLinkUrl as string;
-    if (!paymentLinkUrl) {
-      return res.sendError('Não foi possível obter a URL de pagamento do Asaas.', 500);
+
+    if (paymentMethod === 'boleto') {
+      payloadAsaas.dueDateLimitDays = 5;
     }
-    return res.sendSuccess({ paymentLinkUrl });
+
+    const resposta = await axios.post('https://api.asaas.com/v3/paymentLinks', payloadAsaas, {
+      headers: {
+        'Content-Type': 'application/json',
+        access_token: process.env.ASAAS_API_KEY!,
+      },
+    });
+
+    const asaasLinkId = resposta.data.id.toString();
+    await prisma.pedido.update({
+      where: { id: pedidoId },
+      data: { asaasLinkId },
+    });
+
+    return res.sendSuccess({ paymentLinkUrl: resposta.data.paymentLinkUrl });
   } catch (err: any) {
     console.error('Erro em /create-payment-link:', err.response?.data || err);
-    const message = err.response?.data?.message || 'Erro interno ao criar payment link.';
+
+    if (pedidoId) {
+      try {
+        await prisma.pedido.update({
+          where: { id: pedidoId },
+          data: { status: 'CANCELADO' },
+        });
+        console.log(`Pedido ${pedidoId} cancelado por erro na criação do link.`);
+      } catch (updErr) {
+        console.error(`Falha ao cancelar pedido ${pedidoId}:`, updErr);
+      }
+    }
+
+    const message =
+      err.response?.data?.errors?.[0]?.description ||
+      err.response?.data?.message ||
+      'Erro interno ao criar payment link.';
     return res.sendError(message, 500);
   }
 });
