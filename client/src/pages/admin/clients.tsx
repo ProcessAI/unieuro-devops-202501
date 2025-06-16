@@ -165,9 +165,13 @@ export default function PaginaPedidos() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0705] text-white flex flex-col">
-      <Header />
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+    <div className="min-h-screen bg-[#130F0E]">
+      <header className="bg-[#130F0E] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Header />
+        </div>
+      </header>
+      <main className="bg-[#130F0E] flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Pedidos</h1>
 
         <div className="bg-[#1A1615] rounded-lg shadow-lg overflow-x-auto">

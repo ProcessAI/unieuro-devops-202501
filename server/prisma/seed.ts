@@ -971,6 +971,7 @@ async function main() {
   if (!produto1 || !produto11) {
     console.error('Produtos de exemplo não encontrados. Certifique-se de que os produtos com ID 1 e 11 existem.');
     return;
+  }
   // Garante que os produtos específicos para os pedidos existam ou os cria
   // Para o primeiro pedido: "Cadeira de Escritório Ergonômica"
   let produtoPedido1 = await prisma.produto.findFirst({
