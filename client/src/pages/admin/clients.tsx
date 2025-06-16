@@ -2,176 +2,236 @@ import { useEffect, useState } from 'react';
 import { useToast } from '@/components/ToastContext';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import {
+  IconPackage,
+  IconTruck,
+  IconCircleCheck,
+  IconCircleX,
+  IconReceipt,
+} from '@tabler/icons-react';
 
-// NOVO: Define o tipo para um Pedido (simplificado)
+// NOVO: Define os possíveis status de um pedido com base no fluxo da imagem
+type StatusPedido =
+  | 'Pedido Realizado'
+  | 'Pgto Aprovado'
+  | 'Pgto Recusado'
+  | 'Pgto Confirmado'
+  | 'Em separação'
+  | 'Separado Embalado'
+  | 'Aguardando coleta'
+  | 'Pedido coletado'
+  | 'Pedido Entregue'
+  | 'Pedido Devolvido'
+  | 'Pagamento Estornado';
+
+// NOVO: Define a estrutura de dados para um Pedido
 type Pedido = {
   id: number;
-  valor: number;
-  status: 'CONCLUIDO' | 'PENDENTE';
+  dataPedido: Date;
+  nomeCliente: string;
+  qtdProdutos: number;
+  precoTotal: number;
+  formaPagamento: 'PIX' | 'Cartão' | 'Boleto';
+  dataStatus: Date;
+  status: StatusPedido;
 };
 
-// ALTERADO: Cliente agora pode ter uma lista de pedidos
-type Cliente = {
-  id: number;
-  nome: string;
-  email: string;
-  cpf: string;
-  tipoConta: 'VAREJO' | 'ATACADO';
-  pedidos: Pedido[]; // Adicionado para simular os pedidos
-};
-
-// NOVO: Dados de exemplo (mock) para simular a resposta do backend
-// Alguns clientes têm pedidos, outros não.
-const mockClientes: Cliente[] = [
+// NOVO: Dados de exemplo para simular a resposta do backend
+const mockPedidos: Pedido[] = [
   {
-    id: 1,
-    nome: 'Lorrana',
-    email: 'lorrana@example.com',
-    cpf: '111.111.111-11',
-    tipoConta: 'VAREJO',
-    pedidos: [
-      { id: 101, valor: 150.0, status: 'CONCLUIDO' },
-      { id: 102, valor: 200.0, status: 'CONCLUIDO' },
-    ],
+    id: 202501,
+    dataPedido: new Date(new Date().getTime() - 2 * 60 * 60 * 1000), // 2 horas atrás
+    nomeCliente: 'Lorrana',
+    qtdProdutos: 3,
+    precoTotal: 259.9,
+    formaPagamento: 'Cartão',
+    dataStatus: new Date(),
+    status: 'Pgto Aprovado',
   },
   {
-    id: 2,
-    nome: 'Esdras',
-    email: 'esdras@example.com',
-    cpf: '222.222.222-22',
-    tipoConta: 'VAREJO',
-    pedidos: [], // Este cliente ainda não tem pedidos
+    id: 202502,
+    dataPedido: new Date(new Date().getTime() - 24 * 60 * 60 * 1000), // 1 dia atrás
+    nomeCliente: 'Esdras',
+    qtdProdutos: 1,
+    precoTotal: 89.9,
+    formaPagamento: 'PIX',
+    dataStatus: new Date(),
+    status: 'Em separação',
   },
   {
-    id: 3,
-    nome: 'Cliente Atacadista Aprovado',
-    email: 'aprovado@example.com',
-    cpf: '333.333.333-33',
-    tipoConta: 'ATACADO',
-    pedidos: [{ id: 103, valor: 1250.0, status: 'CONCLUIDO' }],
+    id: 202503,
+    dataPedido: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), // 3 dias atrás
+    nomeCliente: 'Victor',
+    qtdProdutos: 5,
+    precoTotal: 540.5,
+    formaPagamento: 'Boleto',
+    dataStatus: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
+    status: 'Pedido Entregue',
   },
-    {
-    id: 4,
-    nome: 'Victor',
-    email: 'victor@example.com',
-    cpf: '444.444.444-44',
-    tipoConta: 'VAREJO',
-    pedidos: [{ id: 104, valor: 80.0, status: 'CONCLUIDO' }],
+  {
+    id: 202504,
+    dataPedido: new Date(new Date().getTime() - 5 * 60 * 1000), // 5 minutos atrás
+    nomeCliente: 'Caio Martins',
+    qtdProdutos: 2,
+    precoTotal: 150.0,
+    formaPagamento: 'Cartão',
+    dataStatus: new Date(),
+    status: 'Pgto Recusado',
+  },
+  {
+    id: 202505,
+    dataPedido: new Date(new Date().getTime() - 4 * 24 * 60 * 60 * 1000),
+    nomeCliente: 'Lucas Moreira',
+    qtdProdutos: 1,
+    precoTotal: 1299.9,
+    formaPagamento: 'PIX',
+    dataStatus: new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000),
+    status: 'Pedido Devolvido',
   },
 ];
 
-export default function PaginaClientes() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { showToast } = useToast();
+// NOVO: Função para formatar o tempo relativo (ex: "há 5 minutos")
+const formatTimeAgo = (date: Date): string => {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return `há ${Math.floor(interval)} anos`;
+  interval = seconds / 2592000;
+  if (interval > 1) return `há ${Math.floor(interval)} meses`;
+  interval = seconds / 86400;
+  if (interval > 1) return `há ${Math.floor(interval)} dias`;
+  interval = seconds / 3600;
+  if (interval > 1) return `há ${Math.floor(interval)} horas`;
+  interval = seconds / 60;
+  if (interval > 1) return `há ${Math.floor(interval)} minutos`;
+  return `há ${Math.floor(seconds)} segundos`;
+};
 
-  // ALTERADO: Efeito para buscar os dados. Agora usa os dados mockados.
+// NOVO: Função para estilizar o status do pedido
+const getStatusStyle = (status: StatusPedido) => {
+  switch (status) {
+    case 'Pedido Entregue':
+      return {
+        icon: <IconCircleCheck size={16} />,
+        className: 'bg-green-600 text-white',
+      };
+    case 'Pgto Recusado':
+    case 'Pedido Devolvido':
+    case 'Pagamento Estornado':
+      return {
+        icon: <IconCircleX size={16} />,
+        className: 'bg-red-600 text-white',
+      };
+    case 'Em separação':
+    case 'Separado Embalado':
+      return {
+        icon: <IconPackage size={16} />,
+        className: 'bg-yellow-500 text-black',
+      };
+    case 'Aguardando coleta':
+    case 'Pedido coletado':
+      return {
+        icon: <IconTruck size={16} />,
+        className: 'bg-blue-500 text-white',
+      };
+    default:
+      return {
+        icon: <IconReceipt size={16} />,
+        className: 'bg-gray-500 text-white',
+      };
+  }
+};
+
+export default function PaginaPedidos() {
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    // Simula o carregamento da rede
     setTimeout(() => {
-      setClientes(mockClientes);
+      setPedidos(mockPedidos);
       setLoading(false);
     }, 1000);
-
-    /* // O fetch original foi comentado para usar os dados mockados.
-      // Quando seu backend estiver pronto para enviar os pedidos junto com os clientes,
-      // você pode remover o setTimeout acima e descomentar este bloco.
-
-      fetch('/api/admin/clientes')
-       .then((res) => {
-         if (!res.ok) {
-           throw new Error('Falha ao buscar clientes.');
-         }
-         return res.json();
-       })
-       .then((data) => {
-         setClientes(data.clientes);
-       })
-       .catch((error) => {
-         showToast(error.message, { duration: 6000 });
-       })
-       .finally(() => {
-         setLoading(false);
-       });
-    */
   }, []);
 
-  const handleApprove = async (clienteId: number) => {
-    try {
-      // A lógica de request continua a mesma, mas a UI é atualizada otimisticamente.
-      showToast('Simulando aprovação...', { duration: 2000 });
-      
-      setClientes((prevClientes) =>
-        prevClientes.map((cliente) =>
-          cliente.id === clienteId ? { ...cliente, tipoConta: 'ATACADO' } : cliente
-        )
-      );
-      // Em um cenário real, você faria o fetch aqui e trataria a resposta.
-      // const res = await fetch(`/api/admin/clientes/${clienteId}/aprovar-atacado`, { method: 'PATCH' });
-      // ...
-    } catch {
-      showToast('Falha de rede na simulação.', { duration: 5000 });
-    }
+  const handleVerDetalhes = (pedidoId: number) => {
+    alert(`Lógica para ver detalhes do pedido #${pedidoId} ainda não implementada.`);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0D0705] text-white flex justify-center items-center">
-        <p>Carregando clientes...</p>
+        <p>Carregando pedidos...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0705] text-white">
+    <div className="min-h-screen bg-[#0D0705] text-white flex flex-col">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Clientes</h1>
-        
-        <div className="bg-[#1A1615] rounded-lg shadow-lg overflow-hidden">
-          <table className="w-full text-left">
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Pedidos</h1>
+
+        <div className="bg-[#1A1615] rounded-lg shadow-lg overflow-x-auto">
+          <table className="w-full text-left min-w-[1000px]">
             <thead>
               <tr className="border-b border-gray-700 bg-[#130F0E]">
-                <th className="p-4">Nome</th>
-                <th className="p-4">Email</th>
-                <th className="p-4">Status da Conta</th>
-                <th className="p-4 text-center">Pedidos Realizados</th> {/* NOVO: Coluna de pedidos */}
+                <th className="p-4">Pedido</th>
+                <th className="p-4">Cliente</th>
+                <th className="p-4 text-center">Itens</th>
+                <th className="p-4">Valor Total</th>
+                <th className="p-4">Pagamento</th>
+                <th className="p-4">Status</th>
                 <th className="p-4 text-center">Ação</th>
               </tr>
             </thead>
             <tbody>
-              {clientes.map((cliente) => (
-                <tr key={cliente.id} className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors">
-                  <td className="p-4">{cliente.nome}</td>
-                  <td className="p-4">{cliente.email}</td>
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        cliente.tipoConta === 'ATACADO'
-                          ? 'bg-green-600 text-white'
-                          : 'bg-blue-500 text-white'
-                      }`}
-                    >
-                      {cliente.tipoConta}
-                    </span>
-                  </td>
-                  {/* NOVO: Célula que mostra a contagem de pedidos */}
-                  <td className="p-4 text-center">{cliente.pedidos.length}</td>
-                  <td className="p-4 text-center">
-                    <button
-                      onClick={() => handleApprove(cliente.id)}
-                      // ALTERADO: Lógica de desativação do botão
-                      disabled={cliente.tipoConta === 'ATACADO' || cliente.pedidos.length === 0}
-                      className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:bg-[#C77714] transition"
-                    >
-                      {cliente.tipoConta === 'ATACADO' ? 'Aprovado' : 'Aprovar p/ Atacado'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {pedidos.map((pedido) => {
+                const statusStyle = getStatusStyle(pedido.status);
+                return (
+                  <tr
+                    key={pedido.id}
+                    className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors"
+                  >
+                    <td className="p-4">
+                      <div className="font-bold">#{pedido.id}</div>
+                      <div className="text-xs text-gray-400">
+                        {formatTimeAgo(pedido.dataPedido)}
+                      </div>
+                    </td>
+                    <td className="p-4">{pedido.nomeCliente}</td>
+                    <td className="p-4 text-center">{pedido.qtdProdutos}</td>
+                    <td className="p-4 font-mono">
+                      {pedido.precoTotal.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      })}
+                    </td>
+                    <td className="p-4">{pedido.formaPagamento}</td>
+                    <td className="p-4">
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold w-fit ${statusStyle.className}`}
+                      >
+                        {statusStyle.icon}
+                        <span>{pedido.status}</span>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {pedido.dataStatus.toLocaleDateString('pt-BR')} às{' '}
+                        {pedido.dataStatus.toLocaleTimeString('pt-BR')}
+                      </div>
+                    </td>
+                    <td className="p-4 text-center">
+                      <button
+                        onClick={() => handleVerDetalhes(pedido.id)}
+                        className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition"
+                      >
+                        Ver Detalhes
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
-          </table> 
-        </div> 
+          </table>
+        </div>
       </main>
       <Footer />
     </div>

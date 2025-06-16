@@ -900,6 +900,40 @@ app.post('/reset-password', async (req, res) => {
   return res.sendSuccess({ message: 'Senha redefinida com sucesso!' });
 });
 
+
+app.get('/admin/pedidos-status', isAdminAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const pedidos = await prisma.pedido.findMany({
+      where: {
+        status: {
+          in: ['pago', 'cancelado'], // ou 'cancelado' se você quiser considerar
+        },
+      },
+      orderBy: {
+        dataCompra: 'asc', // Mais antigo para o mais novo
+      },
+      select: {
+        id: true,
+        quantidade: true,
+        clienteId: true,
+        produtoId: true,
+        formaPagamento: true,
+        status: true,
+        valorPago: true,
+        dataCompra: true,
+        dataEntrega: true,
+        notaFiscal: true,
+        assinado: true,
+      },
+    });
+
+    return res.sendSuccess({ pedidos });
+  } catch (error) {
+    console.error('Erro ao buscar pedidos:', error);
+    return res.sendError('Erro ao buscar pedidos.', 500);
+  }
+});
+
 app.get('/produto/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
 

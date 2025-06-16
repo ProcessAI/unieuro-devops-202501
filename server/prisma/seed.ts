@@ -929,7 +929,7 @@ async function main() {
 
   console.log('Seed de Categorias, Marcas, Produtos e Mídias finalizado.');
 
-  // Cria um cliente para associar aos pedidos
+// Cria um cliente para associar aos pedidos ou busca um existente
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash('senha123', saltRounds);
 
@@ -942,7 +942,7 @@ async function main() {
       telefone: '11987654321',
       senha: passwordHash,
       dataNascimento: new Date('1990-01-15T00:00:00Z'),
-      cpf: '12345678901',
+      cpf: '12345678901', // Garanta que este CPF é único no seu banco
       ativo: true,
       verificado: true,
     },
@@ -959,6 +959,7 @@ async function main() {
       verificado: true,
     },
   });
+  console.log(`✅ Cliente "${cliente.nome}" (ID: ${cliente.id}) está pronto.`);
 
   // Busca produtos para usar nos pedidos
   const produto1 = await prisma.produto.findUnique({ where: { id: 1 } });
@@ -970,7 +971,69 @@ async function main() {
   if (!produto1 || !produto11) {
     console.error('Produtos de exemplo não encontrados. Certifique-se de que os produtos com ID 1 e 11 existem.');
     return;
+  // Garante que os produtos específicos para os pedidos existam ou os cria
+  // Para o primeiro pedido: "Cadeira de Escritório Ergonômica"
+  let produtoPedido1 = await prisma.produto.findFirst({
+    where: { nome: 'Cadeira de Escritório Ergonômica' },
+  });
+
+  if (!produtoPedido1) {
+    console.warn('Produto "Cadeira de Escritório Ergonômica" não encontrado, criando...');
+    produtoPedido1 = await prisma.produto.create({
+      data: {
+        nome: 'Cadeira de Escritório Ergonômica',
+        descricao: 'Cadeira confortável com suporte lombar e ajuste de altura.',
+        preco: 499.9,
+        precoOriginal: 599.9,
+        frete: 50,
+        ativo: true,
+        categoriaId: categoriaCasaDeco.id,
+        marcaId: marcaX.id,
+        modelo: 'ERGOCAD',
+        numeroModelo: 'CE001',
+        condicao: 'novo',
+        dimensoes: '60x60x110 cm',
+        garantia: '24 meses',
+        voltagem: 'Não se aplica',
+        localizacaoProduto: 'SP',
+        quantidade: 35,
+        quantidadeVarejo: 1,
+      },
+    });
   }
+  console.log(`✅ Produto para Pedido 1 ("${produtoPedido1.nome}") (ID: ${produtoPedido1.id}) está pronto.`);
+
+
+  // Para o segundo pedido: "Secador Íon Pro 2000W"
+  let produtoPedido2 = await prisma.produto.findFirst({
+    where: { nome: 'Secador Íon Pro 2000W' },
+  });
+
+  if (!produtoPedido2) {
+    console.warn('Produto "Secador Íon Pro 2000W" não encontrado, criando...');
+    produtoPedido2 = await prisma.produto.create({
+      data: {
+        nome: 'Secador Íon Pro 2000W',
+        descricao: 'Secador de cabelo com tecnologia de íons, protege os fios do calor excessivo',
+        preco: 199.99,
+        precoOriginal: 259.99,
+        frete: 20,
+        ativo: true,
+        categoriaId: categoriaBeleza.id,
+        marcaId: marcaX.id,
+        modelo: 'IonPro',
+        numeroModelo: 'SC2000',
+        condicao: 'novo',
+        dimensoes: '25x20x10 cm',
+        garantia: '6 meses',
+        voltagem: 'Bivolt',
+        localizacaoProduto: 'SP',
+        quantidade: 40,
+        quantidadeVarejo: 2,
+      },
+    });
+  }
+  console.log(`✅ Produto para Pedido 2 ("${produtoPedido2.nome}") (ID: ${produtoPedido2.id}) está pronto.`);
 
   // Cria Pedidos
   await prisma.pedido.createMany({
