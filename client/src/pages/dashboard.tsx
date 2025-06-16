@@ -26,16 +26,16 @@ const Dashboard = ({ stats }) => {
               style: 'currency',
               currency: 'BRL',
             })}
-            percentage="↑ 15% essa semana"
-            isPositive={true}
+            percentage={stats.pctVendasSemana}
+            isPositive={stats.pctVendasSemana >= 0}
             icon={<BanknoteArrowUp />}
           />
 
           <StatsCard
             title="Pedidos da Semana"
-            value={stats.pedidosSemana.toString()}
-            percentage="↑ 5% essa semana"
-            isPositive={true}
+            value={stats.pedidosSemana.toLocaleString('pt-BR')}
+            percentage={stats.pctPedidosSemana}
+            isPositive={stats.pctPedidosSemana >= 0}
             icon={<Package />}
           />
 
@@ -45,16 +45,16 @@ const Dashboard = ({ stats }) => {
               style: 'currency',
               currency: 'BRL',
             })}
-            percentage="↑ 2% esse mês"
-            isPositive={true}
+            percentage={stats.pctVendasMes}
+            isPositive={stats.pctVendasMes >= 0}
             icon={<BanknoteArrowUp />}
           />
 
           <StatsCard
             title="Pedidos do Mês"
-            value={stats.pedidosMes.toString()}
-            percentage="↑ 7% esse mês"
-            isPositive={true}
+            value={stats.pedidosMes.toLocaleString('pt-BR')}
+            percentage={stats.pctPedidosMes}
+            isPositive={stats.pctPedidosMes >= 0}
             icon={<Package />}
           />
         </div>

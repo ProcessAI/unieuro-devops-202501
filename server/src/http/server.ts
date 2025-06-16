@@ -518,66 +518,89 @@ app.get('/produto/:id', async (req: Request, res: Response) => {
   }
 });
 
+// server.ts
 app.get('/dashboard/estatisticas', async (req: Request, res: Response) => {
   try {
     const hoje = new Date();
-    const umaSemanaAtras = new Date();
-    umaSemanaAtras.setDate(hoje.getDate() - 7);
 
-    const umMesAtras = new Date();
-    umMesAtras.setMonth(hoje.getMonth() - 1);
+    // --- Períodos de comparação -------------------------------------------
+    const inicioSemanaAtual   = new Date(hoje); inicioSemanaAtual.setDate(hoje.getDate() - 6);   // 7 dias
+    const inicioSemanaPassada = new Date(hoje); inicioSemanaPassada.setDate(hoje.getDate() - 13); // 14 dias
+    const inicioMesAtual      = new Date(hoje); inicioMesAtual.setDate(1);                       // dia 1 do mês
+    const fimMesPassado       = new Date(inicioMesAtual); fimMesPassado.setDate(0);              // último dia mês-1
+    const inicioMesPassado    = new Date(fimMesPassado);  inicioMesPassado.setDate(1);
 
-    const [vendasSemana, pedidosSemana, vendasMes, pedidosMes] = await Promise.all([
-      prisma.pedido.aggregate({
+    // --- Query helpers -----------------------------------------------------
+    const sumValorPago = prisma.pedido.aggregate({
+      _sum: { valorPago: true }, where: {}    // será sobrescrito
+    });
+    const countPedidos = prisma.pedido.count({ where: {} });
+
+    // --- Leituras ----------------------------------------------------------
+    const [
+      somaSemanaAtual,   // vendasSemana
+      somaSemanaPassada,
+      pedidosSemanaAtual,
+      pedidosSemanaPassada,
+      somaMesAtual,      // vendasMes
+      somaMesPassado,
+      pedidosMesAtual,
+      pedidosMesPassado,
+    ] = await Promise.all([
+      prisma.pedido.aggregate({                 // vendas da semana atual
         _sum: { valorPago: true },
-        where: {
-          dataCompra: {
-            gte: umaSemanaAtras,
-            lte: hoje,
-          },
-        },
+        where: { dataCompra: { gte: inicioSemanaAtual, lte: hoje } },
       }),
-
-      prisma.pedido.count({
-        where: {
-          dataCompra: {
-            gte: umaSemanaAtras,
-            lte: hoje,
-          },
-        },
-      }),
-
-      prisma.pedido.aggregate({
+      prisma.pedido.aggregate({                 // vendas da semana passada
         _sum: { valorPago: true },
-        where: {
-          dataCompra: {
-            gte: umMesAtras,
-            lte: hoje,
-          },
-        },
+        where: { dataCompra: { gte: inicioSemanaPassada, lt: inicioSemanaAtual } },
       }),
-
-      prisma.pedido.count({
-        where: {
-          dataCompra: {
-            gte: umMesAtras,
-            lte: hoje,
-          },
-        },
+      prisma.pedido.count({                     // pedidos da semana atual
+        where: { dataCompra: { gte: inicioSemanaAtual, lte: hoje } },
+      }),
+      prisma.pedido.count({                     // pedidos da semana passada
+        where: { dataCompra: { gte: inicioSemanaPassada, lt: inicioSemanaAtual } },
+      }),
+      prisma.pedido.aggregate({                 // vendas do mês atual
+        _sum: { valorPago: true },
+        where: { dataCompra: { gte: inicioMesAtual, lte: hoje } },
+      }),
+      prisma.pedido.aggregate({                 // vendas do mês passado
+        _sum: { valorPago: true },
+        where: { dataCompra: { gte: inicioMesPassado, lte: fimMesPassado } },
+      }),
+      prisma.pedido.count({                     // pedidos do mês atual
+        where: { dataCompra: { gte: inicioMesAtual, lte: hoje } },
+      }),
+      prisma.pedido.count({                     // pedidos do mês passado
+        where: { dataCompra: { gte: inicioMesPassado, lte: fimMesPassado } },
       }),
     ]);
 
+    // --- Função de % -------------------------------------------------------
+    const calcPct = (atual: number, anterior: number) =>
+      anterior === 0 ? (atual === 0 ? 0 : 100) : ((atual - anterior) / anterior) * 100;
+
+    // --- Payload -----------------------------------------------------------
     res.sendSuccess({
-      vendasSemana: Number(vendasSemana._sum.valorPago || 0),
-      pedidosSemana,
-      vendasMes: Number(vendasMes._sum.valorPago || 0),
-      pedidosMes,
+      vendasSemana:  Number(somaSemanaAtual._sum.valorPago || 0),
+      pedidosSemana: pedidosSemanaAtual,
+      vendasMes:     Number(somaMesAtual._sum.valorPago || 0),
+      pedidosMes:    pedidosMesAtual,
+
+      pctVendasSemana:  calcPct(Number(somaSemanaAtual._sum.valorPago || 0),
+                               Number(somaSemanaPassada._sum.valorPago || 0)),
+      pctPedidosSemana: calcPct(pedidosSemanaAtual, pedidosSemanaPassada),
+      pctVendasMes:    calcPct(Number(somaMesAtual._sum.valorPago || 0),
+                               Number(somaMesPassado._sum.valorPago || 0)),
+      pctPedidosMes:   calcPct(pedidosMesAtual, pedidosMesPassado),
     });
   } catch (err) {
     console.error(err);
     res.sendError('Erro ao carregar estatísticas do dashboard.', 500);
   }
 });
+
 
 app.get('/dashboard/vendas-mensais', async (req, res) => {
   const agora = new Date();
