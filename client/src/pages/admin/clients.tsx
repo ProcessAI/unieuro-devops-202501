@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Header } from '@/components/Header';
+import { AdminHeader } from '@/components/AdminHeader';
 import { Footer } from '@/components/Footer';
 import {
   IconCircleCheck,
@@ -95,7 +95,7 @@ export default function PaginaPedidos() {
     <div className="min-h-screen bg-[#130F0E] text-white flex flex-col">
       <header className="bg-[#130F0E] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Header />
+          <AdminHeader />
         </div>
       </header>
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
