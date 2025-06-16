@@ -945,6 +945,65 @@ app.get('/produto/:id', async (req: Request, res: Response) => {
   }
 });
 
+// [R]EAD - Obter todos os produtos
+app.get('/admin/produtos', isAdminAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const produtos = await prisma.produto.findMany({ orderBy: { id: 'asc' } });
+    res.sendSuccess(produtos);
+  } catch (err: any) {
+    console.error('Erro ao buscar produtos:', err);
+    res.sendError(`Erro de Base de Dados: ${err.message}`);
+  }
+});
+
+// [C]REATE - Criar um novo produto
+app.post('/admin/produtos', isAdminAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const { nome, preco, quantidade, ...data } = req.body;
+    if (!nome || !preco || !quantidade) {
+      return res.sendError('Campos obrigatórios (Nome, Preço, Quantidade) estão faltando.', 400);
+    }
+    const novoProduto = await prisma.produto.create({ data });
+    res.status(201).sendSuccess(novoProduto);
+  } catch (err: any) {
+    console.error("Erro ao criar produto:", err);
+    res.sendError(`Erro de Base de Dados ao criar: ${err.message}`);
+  }
+});
+
+// [U]PDATE - Atualizar um produto existente
+app.put('/admin/produtos/:id', isAdminAuthenticated, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+        const produtoAtualizado = await prisma.produto.update({
+            where: { id: parseInt(id) },
+            data: req.body,
+        });
+        res.sendSuccess(produtoAtualizado);
+      } catch (error: any) {
+        console.error(`Erro ao atualizar produto ${id}:`, error);
+        if (error.code === 'P2025') {
+          return res.sendError(`Produto com ID ${id} não encontrado.`, 404);
+        }
+        res.sendError(`Erro de Base de Dados ao atualizar: ${error.message}`);
+    }
+});
+
+// [D]ELETE - Deletar um produto
+app.delete('/admin/produtos/:id', isAdminAuthenticated, async (req: Request, res: Response) => {
+    const { id } = req.params;
+      try {
+        await prisma.produto.delete({ where: { id: parseInt(id) } });
+        res.status(204).send();
+      } catch (error: any) {
+        console.error(`Erro ao deletar produto ${id}:`, error);
+        if (error.code === 'P2025') {
+          return res.sendError(`Produto com ID ${id} não encontrado.`, 404);
+        }
+        res.sendError(`Erro de Base de Dados ao deletar: ${error.message}`);
+    }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
