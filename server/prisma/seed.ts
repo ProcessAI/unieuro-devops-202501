@@ -871,7 +871,7 @@ async function main() {
 
   console.log('Seed de Categorias, Marcas, Produtos e Mídias finalizado.');
 
-  // Cria um cliente para associar aos pedidos
+// Cria um cliente para associar aos pedidos ou busca um existente
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash('senha123', saltRounds);
 
@@ -884,55 +884,116 @@ async function main() {
       telefone: '11987654321',
       senha: passwordHash,
       dataNascimento: new Date('1990-01-15T00:00:00Z'),
-      cpf: '12345678901',
+      cpf: '12345678901', // Garanta que este CPF é único no seu banco
       ativo: true,
       verificado: true, // Já cria como verificado para simplificar
     },
   });
+  console.log(`✅ Cliente "${cliente.nome}" (ID: ${cliente.id}) está pronto.`);
 
-  // Busca produtos para usar nos pedidos
-  const produto1 = await prisma.produto.findUnique({ where: { id: 1 } });
-  const produto11 = await prisma.produto.findUnique({ where: { id: 11 } });
-
-  if (!produto1 || !produto11) {
-    console.error('Produtos de exemplo não encontrados. Certifique-se de que os produtos com ID 1 e 11 existem.');
-    return;
-  }
-
-  // Cria Pedidos
-  await prisma.pedido.createMany({
-    data: [
-      {
-        quantidade: 1,
-        clienteId: cliente.id,
-        dataCompra: new Date('2025-05-10T10:00:00Z'),
-        produtoId: produto1.id,
-        formaPagamento: 'Cartão de Crédito',
-        status: 'Entregue',
-        valorPago: produto1.preco,
-        dataEntrega: new Date('2025-05-15T18:00:00Z'),
-        notaFiscal: 'NF-00001',
-        dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
-        assinado: 'João Silva',
-      },
-      {
-        quantidade: 2,
-        clienteId: cliente.id,
-        dataCompra: new Date('2025-06-01T14:30:00Z'),
-        produtoId: produto11.id,
-        formaPagamento: 'Pix',
-        status: 'Enviado',
-        valorPago: Number(produto11.preco) * 2,
-        dataEntrega: new Date('2025-06-10T18:00:00Z'), // Entrega estimada
-        notaFiscal: 'NF-00002',
-        dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
-        assinado: 'Não assinado',
-      },
-    ],
-    skipDuplicates: true,
+  // Garante que os produtos específicos para os pedidos existam ou os cria
+  // Para o primeiro pedido: "Cadeira de Escritório Ergonômica"
+  let produtoPedido1 = await prisma.produto.findFirst({
+    where: { nome: 'Cadeira de Escritório Ergonômica' },
   });
 
-  console.log('Cliente e Pedidos semeados com sucesso!');
+  if (!produtoPedido1) {
+    console.warn('Produto "Cadeira de Escritório Ergonômica" não encontrado, criando...');
+    produtoPedido1 = await prisma.produto.create({
+      data: {
+        nome: 'Cadeira de Escritório Ergonômica',
+        descricao: 'Cadeira confortável com suporte lombar e ajuste de altura.',
+        preco: 499.9,
+        precoOriginal: 599.9,
+        frete: 50,
+        ativo: true,
+        categoriaId: categoriaCasaDeco.id,
+        marcaId: marcaX.id,
+        modelo: 'ERGOCAD',
+        numeroModelo: 'CE001',
+        condicao: 'novo',
+        dimensoes: '60x60x110 cm',
+        garantia: '24 meses',
+        voltagem: 'Não se aplica',
+        localizacaoProduto: 'SP',
+        quantidade: 35,
+        quantidadeVarejo: 1,
+      },
+    });
+  }
+  console.log(`✅ Produto para Pedido 1 ("${produtoPedido1.nome}") (ID: ${produtoPedido1.id}) está pronto.`);
+
+
+  // Para o segundo pedido: "Secador Íon Pro 2000W"
+  let produtoPedido2 = await prisma.produto.findFirst({
+    where: { nome: 'Secador Íon Pro 2000W' },
+  });
+
+  if (!produtoPedido2) {
+    console.warn('Produto "Secador Íon Pro 2000W" não encontrado, criando...');
+    produtoPedido2 = await prisma.produto.create({
+      data: {
+        nome: 'Secador Íon Pro 2000W',
+        descricao: 'Secador de cabelo com tecnologia de íons, protege os fios do calor excessivo',
+        preco: 199.99,
+        precoOriginal: 259.99,
+        frete: 20,
+        ativo: true,
+        categoriaId: categoriaBeleza.id,
+        marcaId: marcaX.id,
+        modelo: 'IonPro',
+        numeroModelo: 'SC2000',
+        condicao: 'novo',
+        dimensoes: '25x20x10 cm',
+        garantia: '6 meses',
+        voltagem: 'Bivolt',
+        localizacaoProduto: 'SP',
+        quantidade: 40,
+        quantidadeVarejo: 2,
+      },
+    });
+  }
+  console.log(`✅ Produto para Pedido 2 ("${produtoPedido2.nome}") (ID: ${produtoPedido2.id}) está pronto.`);
+
+  // Cria Pedidos
+  console.log('Tentando criar Pedidos...');
+  try {
+    await prisma.pedido.createMany({
+      data: [
+        {
+          quantidade: 1,
+          clienteId: cliente.id,
+          dataCompra: new Date('2025-05-10T10:00:00Z'),
+          produtoId: produtoPedido1.id,
+          formaPagamento: 'Cartão de Crédito',
+          status: 'pago',
+          valorPago: produtoPedido1.preco,
+          dataEntrega: new Date('2025-05-15T18:00:00Z'),
+          notaFiscal: 'NF-00001',
+          dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
+          assinado: 'João Silva',
+        },
+        {
+          quantidade: 2,
+          clienteId: cliente.id,
+          dataCompra: new Date('2025-06-01T14:30:00Z'),
+          produtoId: produtoPedido2.id, // Usando produtoPedido2 aqui
+          formaPagamento: 'Pix',
+          status: 'cancelado',
+          valorPago: Number(produtoPedido2.preco) * 2,
+          dataEntrega: new Date('2025-06-10T18:00:00Z'), // Entrega estimada
+          notaFiscal: 'NF-00002',
+          dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
+          assinado: 'Renato Lopes',
+        
+        },
+      ],
+      skipDuplicates: true,
+    });
+    console.log('🎉 Cliente e Pedidos semeados com sucesso!');
+  } catch (error) {
+    console.error('❌ Erro ao criar pedidos:', error);
+  }
 }
 
 main()
