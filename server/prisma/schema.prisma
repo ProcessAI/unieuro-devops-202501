@@ -84,10 +84,12 @@ model Pedido {
   formaPagamento String
   status         String // "pago | cancelado | pendente | devolvido | troca"
   valorPago      Decimal
-  dataEntrega    DateTime
-  notaFiscal     String
-  dataDevolucao  DateTime
-  assinado       String
+  dataEntrega    DateTime?
+  notaFiscal     String?
+  dataDevolucao  DateTime?
+  assinado       String?
+  asaasLinkId    String?
+  descricaoError String?
   Cliente        Cliente  @relation(fields: [clienteId], references: [id])
   Produto        Produto  @relation(fields: [produtoId], references: [id])
 }
