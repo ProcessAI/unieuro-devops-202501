@@ -615,9 +615,6 @@ app.get('/dashboard/vendas-mensais', async (req, res) => {
 });
 
 app.get('/dashboard/categorias-vendas', async (req, res) => {
-  // -----------------------------------------------------------
-  // 1. Período de busca
-  // -----------------------------------------------------------
   const filtro = (req.query.filtro as string) ?? 'mes';
   const agora   = new Date();
   let inicio: Date;

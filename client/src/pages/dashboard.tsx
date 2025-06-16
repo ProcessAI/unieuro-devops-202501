@@ -1,5 +1,7 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
+import { AdminHeader } from '@/components/AdminHeader';
+import { Footer } from '@/components/Footer';
 import StatsCard from '../components/StatsCard';
 import LineChart from '../components/LineChart';
 import PieChart from '../components/PieChart';
@@ -10,11 +12,14 @@ const Dashboard = ({ stats }) => {
   if (!stats) return <p className="text-white">Erro ao carregar dados do dashboard.</p>;
 
   return (
-    <div className="min-h-screen bg-[#130F0E] p-6">
+    <div className="min-h-screen bg-[#130F0E]">
+      <header className="bg-[#130F0E] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AdminHeader />
+        </div>
+      </header>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-white text-3xl font-light mb-8">Dashboard</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8 py-12">
           <StatsCard
             title="Vendas da Semana"
             value={stats.vendasSemana.toLocaleString('pt-BR', {
@@ -54,13 +59,16 @@ const Dashboard = ({ stats }) => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:px-8 py-4">
           <LineChart />
           <PieChart />
         </div>
 
-        <OrdersTable />
+        <div className="px-4 sm:px-6 lg:px-8 py-12">
+          <OrdersTable /> {/* Preciso da lógica de pedidos pronta */}
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };
