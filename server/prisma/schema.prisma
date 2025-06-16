@@ -9,7 +9,7 @@ model Produto {
   nome               String
   descricao          String
   preco              Decimal
-  precoOriginal      Decimal // ✅ Campo novo aqui
+  precoOriginal      Decimal
   frete              Decimal
   ativo              Boolean
   categoriaId        Int

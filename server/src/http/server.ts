@@ -900,6 +900,40 @@ app.post('/reset-password', async (req, res) => {
   return res.sendSuccess({ message: 'Senha redefinida com sucesso!' });
 });
 
+
+app.get('/admin/pedidos-status', isAdminAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const pedidos = await prisma.pedido.findMany({
+      where: {
+        status: {
+          in: ['pago', 'cancelado'], // ou 'cancelado' se você quiser considerar
+        },
+      },
+      orderBy: {
+        dataCompra: 'asc', // Mais antigo para o mais novo
+      },
+      select: {
+        id: true,
+        quantidade: true,
+        clienteId: true,
+        produtoId: true,
+        formaPagamento: true,
+        status: true,
+        valorPago: true,
+        dataCompra: true,
+        dataEntrega: true,
+        notaFiscal: true,
+        assinado: true,
+      },
+    });
+
+    return res.sendSuccess({ pedidos });
+  } catch (error) {
+    console.error('Erro ao buscar pedidos:', error);
+    return res.sendError('Erro ao buscar pedidos.', 500);
+  }
+});
+
 app.get('/produto/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
@@ -942,6 +976,251 @@ app.get('/produto/:id', async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.sendError('Erro ao buscar produto.', 500);
+  }
+});
+
+// [R]EAD - Obter todos os produtos
+app.get('/admin/produtos', isAdminAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const produtos = await prisma.produto.findMany({ orderBy: { id: 'asc' } });
+    res.sendSuccess(produtos);
+  } catch (err: any) {
+    console.error('Erro ao buscar produtos:', err);
+    res.sendError(`Erro de Base de Dados: ${err.message}`);
+  }
+});
+
+// [C]REATE - Criar um novo produto
+app.post('/admin/produtos', isAdminAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const { nome, preco, quantidade, ...data } = req.body;
+    if (!nome || !preco || !quantidade) {
+      return res.sendError('Campos obrigatórios (Nome, Preço, Quantidade) estão faltando.', 400);
+    }
+    const novoProduto = await prisma.produto.create({ data });
+    res.status(201).sendSuccess(novoProduto);
+  } catch (err: any) {
+    console.error("Erro ao criar produto:", err);
+    res.sendError(`Erro de Base de Dados ao criar: ${err.message}`);
+  }
+});
+
+// [U]PDATE - Atualizar um produto existente
+app.put('/admin/produtos/:id', isAdminAuthenticated, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+        const produtoAtualizado = await prisma.produto.update({
+            where: { id: parseInt(id) },
+            data: req.body,
+        });
+        res.sendSuccess(produtoAtualizado);
+      } catch (error: any) {
+        console.error(`Erro ao atualizar produto ${id}:`, error);
+        if (error.code === 'P2025') {
+          return res.sendError(`Produto com ID ${id} não encontrado.`, 404);
+        }
+        res.sendError(`Erro de Base de Dados ao atualizar: ${error.message}`);
+    }
+});
+
+// [D]ELETE - Deletar um produto
+app.delete('/admin/produtos/:id', isAdminAuthenticated, async (req: Request, res: Response) => {
+    const { id } = req.params;
+      try {
+        await prisma.produto.delete({ where: { id: parseInt(id) } });
+        res.status(204).send();
+      } catch (error: any) {
+        console.error(`Erro ao deletar produto ${id}:`, error);
+        if (error.code === 'P2025') {
+          return res.sendError(`Produto com ID ${id} não encontrado.`, 404);
+        }
+        res.sendError(`Erro de Base de Dados ao deletar: ${error.message}`);
+    }
+});
+
+// server.ts
+app.get('/dashboard/estatisticas', async (req: Request, res: Response) => {
+  try {
+    const hoje = new Date();
+
+    // --- Períodos de comparação -------------------------------------------
+    const inicioSemanaAtual   = new Date(hoje); inicioSemanaAtual.setDate(hoje.getDate() - 6);   // 7 dias
+    const inicioSemanaPassada = new Date(hoje); inicioSemanaPassada.setDate(hoje.getDate() - 13); // 14 dias
+    const inicioMesAtual      = new Date(hoje); inicioMesAtual.setDate(1);                       // dia 1 do mês
+    const fimMesPassado       = new Date(inicioMesAtual); fimMesPassado.setDate(0);              // último dia mês-1
+    const inicioMesPassado    = new Date(fimMesPassado);  inicioMesPassado.setDate(1);
+
+    // --- Query helpers -----------------------------------------------------
+    const sumValorPago = prisma.pedido.aggregate({
+      _sum: { valorPago: true }, where: {}    // será sobrescrito
+    });
+    const countPedidos = prisma.pedido.count({ where: {} });
+
+    // --- Leituras ----------------------------------------------------------
+    const [
+      somaSemanaAtual,   // vendasSemana
+      somaSemanaPassada,
+      pedidosSemanaAtual,
+      pedidosSemanaPassada,
+      somaMesAtual,      // vendasMes
+      somaMesPassado,
+      pedidosMesAtual,
+      pedidosMesPassado,
+    ] = await Promise.all([
+      prisma.pedido.aggregate({                 // vendas da semana atual
+        _sum: { valorPago: true },
+        where: { dataCompra: { gte: inicioSemanaAtual, lte: hoje } },
+      }),
+      prisma.pedido.aggregate({                 // vendas da semana passada
+        _sum: { valorPago: true },
+        where: { dataCompra: { gte: inicioSemanaPassada, lt: inicioSemanaAtual } },
+      }),
+      prisma.pedido.count({                     // pedidos da semana atual
+        where: { dataCompra: { gte: inicioSemanaAtual, lte: hoje } },
+      }),
+      prisma.pedido.count({                     // pedidos da semana passada
+        where: { dataCompra: { gte: inicioSemanaPassada, lt: inicioSemanaAtual } },
+      }),
+      prisma.pedido.aggregate({                 // vendas do mês atual
+        _sum: { valorPago: true },
+        where: { dataCompra: { gte: inicioMesAtual, lte: hoje } },
+      }),
+      prisma.pedido.aggregate({                 // vendas do mês passado
+        _sum: { valorPago: true },
+        where: { dataCompra: { gte: inicioMesPassado, lte: fimMesPassado } },
+      }),
+      prisma.pedido.count({                     // pedidos do mês atual
+        where: { dataCompra: { gte: inicioMesAtual, lte: hoje } },
+      }),
+      prisma.pedido.count({                     // pedidos do mês passado
+        where: { dataCompra: { gte: inicioMesPassado, lte: fimMesPassado } },
+      }),
+    ]);
+
+    // --- Função de % -------------------------------------------------------
+    const calcPct = (atual: number, anterior: number) =>
+      anterior === 0 ? (atual === 0 ? 0 : 100) : ((atual - anterior) / anterior) * 100;
+
+    // --- Payload -----------------------------------------------------------
+    res.sendSuccess({
+      vendasSemana:  Number(somaSemanaAtual._sum.valorPago || 0),
+      pedidosSemana: pedidosSemanaAtual,
+      vendasMes:     Number(somaMesAtual._sum.valorPago || 0),
+      pedidosMes:    pedidosMesAtual,
+
+      pctVendasSemana:  calcPct(Number(somaSemanaAtual._sum.valorPago || 0),
+                               Number(somaSemanaPassada._sum.valorPago || 0)),
+      pctPedidosSemana: calcPct(pedidosSemanaAtual, pedidosSemanaPassada),
+      pctVendasMes:    calcPct(Number(somaMesAtual._sum.valorPago || 0),
+                               Number(somaMesPassado._sum.valorPago || 0)),
+      pctPedidosMes:   calcPct(pedidosMesAtual, pedidosMesPassado),
+    });
+  } catch (err) {
+    console.error(err);
+    res.sendError('Erro ao carregar estatísticas do dashboard.', 500);
+  }
+});
+
+
+app.get('/dashboard/vendas-mensais', async (req, res) => {
+  const agora = new Date();
+  const anoAtual = agora.getFullYear();
+
+  try {
+    const pedidos = await prisma.pedido.findMany({
+      where: {
+        dataCompra: {
+          gte: new Date(`${anoAtual}-01-01T00:00:00Z`),
+          lte: new Date(`${anoAtual}-12-31T23:59:59Z`),
+        },
+      },
+      select: {
+        dataCompra: true,
+        valorPago: true,
+      },
+    });
+
+    const vendasPorMes = Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(anoAtual, i).toLocaleString('pt-BR', { month: 'short' }),
+      value: 0,
+    }));
+
+    for (const pedido of pedidos) {
+      const mes = new Date(pedido.dataCompra).getMonth();
+      vendasPorMes[mes].value += Number(pedido.valorPago);
+    }
+
+    res.status(200).json({ vendas: vendasPorMes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erro ao carregar vendas mensais.' });
+  }
+});
+
+app.get('/dashboard/categorias-vendas', async (req, res) => {
+  const filtro = (req.query.filtro as string) ?? 'mes';
+  const agora   = new Date();
+  let inicio: Date;
+  let fim   : Date;
+
+  switch (filtro) {
+    case 'dia': {             // hoje
+      inicio = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
+      fim    = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 23, 59, 59);
+      break;
+    }
+    case 'semana': {          // segunda-feira 00:00 → domingo 23:59
+      // getDay(): 0=domingo … 6=sábado  → converte para ISO (segunda=0)
+      const diaSemana = (agora.getDay() + 6) % 7;         // 0-6
+      inicio = new Date(agora);
+      inicio.setDate(agora.getDate() - diaSemana);        // volta até segunda
+      inicio.setHours(0, 0, 0, 0);
+
+      fim = new Date(inicio);
+      fim.setDate(inicio.getDate() + 6);                  // domingo
+      fim.setHours(23, 59, 59, 999);
+      break;
+    }
+    case 'ano': {            // primeiro → último dia do ano
+      inicio = new Date(agora.getFullYear(), 0, 1, 0, 0, 0);
+      fim    = new Date(agora.getFullYear(), 11, 31, 23, 59, 59);
+      break;
+    }
+    default: {               // 'mes' (padrão)
+      inicio = new Date(agora.getFullYear(), agora.getMonth(), 1, 0, 0, 0);
+      fim    = new Date(agora.getFullYear(), agora.getMonth() + 1, 0, 23, 59, 59);
+    }
+  }
+
+  try {
+    const agrupado = await prisma.pedido.groupBy({
+      where: { dataCompra: { gte: inicio, lte: fim } },
+      by   : ['produtoId'],
+      _sum : { quantidade: true },
+    });
+
+    const produtos = await prisma.produto.findMany({
+      where  : { id: { in: agrupado.map((v) => v.produtoId) } },
+      include: { Categoria: { select: { nome: true } } },
+    });
+
+    const somaPorCategoria = new Map<string, number>();
+
+    for (const venda of agrupado) {
+      const produto       = produtos.find((p) => p.id === venda.produtoId);
+      const categoriaNome = produto?.Categoria?.nome;
+      if (!categoriaNome) continue;
+
+      const atual = somaPorCategoria.get(categoriaNome) || 0;
+      somaPorCategoria.set(categoriaNome, atual + (venda._sum.quantidade || 0));
+    }
+
+    const resultado = Array.from(somaPorCategoria, ([name, value]) => ({ name, value }));
+
+    res.status(200).json(resultado);
+  } catch (err) {
+    console.error('Erro ao buscar categorias mais vendidas:', err);
+    res.status(500).json({ message: 'Erro ao buscar categorias mais vendidas.' });
   }
 });
 

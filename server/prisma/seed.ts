@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -230,6 +231,7 @@ async function main() {
       },
     ],
     skipDuplicates: true,
+    skipDuplicates: true,
   });
 
   // Produtos de Moda
@@ -238,6 +240,8 @@ async function main() {
       {
         nome: 'Jaqueta Jeans Masculina Slim',
         descricao: 'Jaqueta jeans com corte slim e lavagem moderna',
+        preco: 179.9,
+        precoOriginal: 229.9,
         preco: 179.9,
         precoOriginal: 229.9,
         frete: 22,
@@ -259,6 +263,8 @@ async function main() {
         descricao: 'Vestido leve e elegante, ideal para o verão',
         preco: 139.9,
         precoOriginal: 169.9,
+        preco: 139.9,
+        precoOriginal: 169.9,
         frete: 18,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -276,6 +282,8 @@ async function main() {
       {
         nome: 'Tênis Esportivo Unissex Corrida Pro',
         descricao: 'Tênis leve com amortecimento para corrida e academia',
+        preco: 249.9,
+        precoOriginal: 299.9,
         preco: 249.9,
         precoOriginal: 299.9,
         frete: 24,
@@ -297,6 +305,8 @@ async function main() {
         descricao: 'Blusa elegante com tecido confortável',
         preco: 69.9,
         precoOriginal: 89.9,
+        preco: 69.9,
+        precoOriginal: 89.9,
         frete: 12,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -314,6 +324,8 @@ async function main() {
       {
         nome: 'Camisa Social Masculina Slim Fit',
         descricao: 'Camisa elegante com tecido de alta qualidade',
+        preco: 119.9,
+        precoOriginal: 149.9,
         preco: 119.9,
         precoOriginal: 149.9,
         frete: 15,
@@ -335,6 +347,8 @@ async function main() {
         descricao: 'Modelagem que valoriza a silhueta com elastano',
         preco: 129.9,
         precoOriginal: 159.9,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 16,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -352,6 +366,8 @@ async function main() {
       {
         nome: 'Casaco Moletom Masculino com Capuz',
         descricao: 'Ideal para dias frios com bolso frontal',
+        preco: 99.9,
+        precoOriginal: 129.9,
         preco: 99.9,
         precoOriginal: 129.9,
         frete: 20,
@@ -373,6 +389,8 @@ async function main() {
         descricao: 'Proteção total contra raios UV e visual moderno',
         preco: 79.9,
         precoOriginal: 109.9,
+        preco: 79.9,
+        precoOriginal: 109.9,
         frete: 10,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -390,6 +408,8 @@ async function main() {
       {
         nome: 'Bolsa Feminina Transversal Couro Sintético',
         descricao: 'Compacta, elegante e prática para o dia a dia',
+        preco: 109.9,
+        precoOriginal: 139.9,
         preco: 109.9,
         precoOriginal: 139.9,
         frete: 14,
@@ -411,6 +431,8 @@ async function main() {
         descricao: 'Resistente à água, com cronômetro e luz de LED',
         preco: 89.9,
         precoOriginal: 119.9,
+        preco: 89.9,
+        precoOriginal: 119.9,
         frete: 11,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -427,6 +449,7 @@ async function main() {
       },
     ],
     skipDuplicates: true,
+    skipDuplicates: true,
   });
 
   // Produtos de Casa e Decoração
@@ -435,6 +458,8 @@ async function main() {
       {
         nome: 'Luminária de Mesa Vintage',
         descricao: 'Luminária com design retrô e luz regulável',
+        preco: 149.9,
+        precoOriginal: 189.9,
         preco: 149.9,
         precoOriginal: 189.9,
         frete: 20,
@@ -456,6 +481,8 @@ async function main() {
         descricao: 'Almofadas com estampas modernas e confortáveis',
         preco: 99.9,
         precoOriginal: 129.9,
+        preco: 99.9,
+        precoOriginal: 129.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -473,6 +500,8 @@ async function main() {
       {
         nome: 'Vaso Cerâmico Branco',
         descricao: 'Vaso elegante para plantas ou decoração',
+        preco: 79.9,
+        precoOriginal: 99.9,
         preco: 79.9,
         precoOriginal: 99.9,
         frete: 18,
@@ -494,6 +523,8 @@ async function main() {
         descricao: 'Relógio moderno com design clean e silencioso',
         preco: 129.9,
         precoOriginal: 159.9,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 20,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -511,6 +542,8 @@ async function main() {
       {
         nome: 'Castiçal de Metal Dourado',
         descricao: 'Castiçal elegante para velas decorativas',
+        preco: 59.9,
+        precoOriginal: 79.9,
         preco: 59.9,
         precoOriginal: 79.9,
         frete: 12,
@@ -532,6 +565,8 @@ async function main() {
         descricao: 'Tapete macio com design geométrico moderno',
         preco: 299.9,
         precoOriginal: 349.9,
+        preco: 299.9,
+        precoOriginal: 349.9,
         frete: 40,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -549,6 +584,8 @@ async function main() {
       {
         nome: 'Espelho Decorativo Redondo',
         descricao: 'Espelho com moldura dourada para sala ou quarto',
+        preco: 199.9,
+        precoOriginal: 249.9,
         preco: 199.9,
         precoOriginal: 249.9,
         frete: 30,
@@ -570,6 +607,8 @@ async function main() {
         descricao: 'Cortina bloqueia luz, ideal para quartos',
         preco: 249.9,
         precoOriginal: 299.9,
+        preco: 249.9,
+        precoOriginal: 299.9,
         frete: 35,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -587,6 +626,8 @@ async function main() {
       {
         nome: 'Prateleira Flutuante',
         descricao: 'Prateleira em MDF para organização e decoração',
+        preco: 129.9,
+        precoOriginal: 159.9,
         preco: 129.9,
         precoOriginal: 159.9,
         frete: 25,
@@ -608,6 +649,8 @@ async function main() {
         descricao: 'Conjunto elegante para ocasiões especiais',
         preco: 179.9,
         precoOriginal: 219.9,
+        preco: 179.9,
+        precoOriginal: 219.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -624,8 +667,10 @@ async function main() {
       },
     ],
     skipDuplicates: true,
+    skipDuplicates: true,
   });
 
+  // Produtos de Beleza
   // Produtos de Beleza
   await prisma.produto.createMany({
     data: [
@@ -651,6 +696,8 @@ async function main() {
       {
         nome: 'Prancha Alisadora Nano Titanium',
         descricao: 'Alisa com precisão e brilho, indicada para todos os tipos de cabelo',
+        preco: 279.9,
+        precoOriginal: 319.9,
         preco: 279.9,
         precoOriginal: 319.9,
         frete: 25,
@@ -691,6 +738,8 @@ async function main() {
         descricao: 'Limpeza, hidratação e tonificação com produtos dermatologicamente testados',
         preco: 139.9,
         precoOriginal: 169.9,
+        preco: 139.9,
+        precoOriginal: 169.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -708,6 +757,8 @@ async function main() {
       {
         nome: 'Aparador de Pelos Facial Recarregável',
         descricao: 'Remoção delicada de pelos com acabamento suave e indolor',
+        preco: 89.9,
+        precoOriginal: 119.9,
         preco: 89.9,
         precoOriginal: 119.9,
         frete: 12,
@@ -748,6 +799,8 @@ async function main() {
         descricao: 'Depilação suave e eficaz com tecnologia de proteção da pele',
         preco: 129.9,
         precoOriginal: 159.9,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 16,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -786,6 +839,8 @@ async function main() {
         descricao: 'Reduz linhas de expressão e hidrata profundamente',
         preco: 59.9,
         precoOriginal: 79.9,
+        preco: 59.9,
+        precoOriginal: 79.9,
         frete: 10,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -805,6 +860,8 @@ async function main() {
         descricao: 'Escova alisadora com tecnologia para anti-frizz',
         preco: 189.9,
         precoOriginal: 229.9,
+        preco: 189.9,
+        precoOriginal: 229.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -820,6 +877,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
     ],
+    skipDuplicates: true,
     skipDuplicates: true,
   });
 
@@ -871,7 +929,7 @@ async function main() {
 
   console.log('Seed de Categorias, Marcas, Produtos e Mídias finalizado.');
 
-  // Cria um cliente para associar aos pedidos
+// Cria um cliente para associar aos pedidos ou busca um existente
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash('senha123', saltRounds);
 
@@ -884,49 +942,185 @@ async function main() {
       telefone: '11987654321',
       senha: passwordHash,
       dataNascimento: new Date('1990-01-15T00:00:00Z'),
-      cpf: '12345678901',
+      cpf: '12345678901', // Garanta que este CPF é único no seu banco
       ativo: true,
-      verificado: true, // Já cria como verificado para simplificar
+      verificado: true,
+    },
+    where: { email: 'maria.oliveira@example.com' },
+    update: {},
+    create: {
+      nome: 'Maria Oliveira',
+      email: 'maria.oliveira@example.com',
+      telefone: '11987654322',
+      senha: passwordHash,
+      dataNascimento: new Date('1992-10-10T00:00:00Z'),
+      cpf: '12345678957',
+      ativo: true,
+      verificado: true,
     },
   });
+  console.log(`✅ Cliente "${cliente.nome}" (ID: ${cliente.id}) está pronto.`);
 
   // Busca produtos para usar nos pedidos
   const produto1 = await prisma.produto.findUnique({ where: { id: 1 } });
   const produto11 = await prisma.produto.findUnique({ where: { id: 11 } });
+  const produto19 = await prisma.produto.findUnique({ where: { id: 19 } });
+  const produto22 = await prisma.produto.findUnique({ where: { id: 22 } });
+  const produto31 = await prisma.produto.findUnique({ where: { id: 31 } });
 
   if (!produto1 || !produto11) {
     console.error('Produtos de exemplo não encontrados. Certifique-se de que os produtos com ID 1 e 11 existem.');
     return;
   }
+  // Garante que os produtos específicos para os pedidos existam ou os cria
+  // Para o primeiro pedido: "Cadeira de Escritório Ergonômica"
+  let produtoPedido1 = await prisma.produto.findFirst({
+    where: { nome: 'Cadeira de Escritório Ergonômica' },
+  });
+
+  if (!produtoPedido1) {
+    console.warn('Produto "Cadeira de Escritório Ergonômica" não encontrado, criando...');
+    produtoPedido1 = await prisma.produto.create({
+      data: {
+        nome: 'Cadeira de Escritório Ergonômica',
+        descricao: 'Cadeira confortável com suporte lombar e ajuste de altura.',
+        preco: 499.9,
+        precoOriginal: 599.9,
+        frete: 50,
+        ativo: true,
+        categoriaId: categoriaCasaDeco.id,
+        marcaId: marcaX.id,
+        modelo: 'ERGOCAD',
+        numeroModelo: 'CE001',
+        condicao: 'novo',
+        dimensoes: '60x60x110 cm',
+        garantia: '24 meses',
+        voltagem: 'Não se aplica',
+        localizacaoProduto: 'SP',
+        quantidade: 35,
+        quantidadeVarejo: 1,
+      },
+    });
+  }
+  console.log(`✅ Produto para Pedido 1 ("${produtoPedido1.nome}") (ID: ${produtoPedido1.id}) está pronto.`);
+
+
+  // Para o segundo pedido: "Secador Íon Pro 2000W"
+  let produtoPedido2 = await prisma.produto.findFirst({
+    where: { nome: 'Secador Íon Pro 2000W' },
+  });
+
+  if (!produtoPedido2) {
+    console.warn('Produto "Secador Íon Pro 2000W" não encontrado, criando...');
+    produtoPedido2 = await prisma.produto.create({
+      data: {
+        nome: 'Secador Íon Pro 2000W',
+        descricao: 'Secador de cabelo com tecnologia de íons, protege os fios do calor excessivo',
+        preco: 199.99,
+        precoOriginal: 259.99,
+        frete: 20,
+        ativo: true,
+        categoriaId: categoriaBeleza.id,
+        marcaId: marcaX.id,
+        modelo: 'IonPro',
+        numeroModelo: 'SC2000',
+        condicao: 'novo',
+        dimensoes: '25x20x10 cm',
+        garantia: '6 meses',
+        voltagem: 'Bivolt',
+        localizacaoProduto: 'SP',
+        quantidade: 40,
+        quantidadeVarejo: 2,
+      },
+    });
+  }
+  console.log(`✅ Produto para Pedido 2 ("${produtoPedido2.nome}") (ID: ${produtoPedido2.id}) está pronto.`);
 
   // Cria Pedidos
   await prisma.pedido.createMany({
     data: [
+      // ✅ SEMANA
       {
         quantidade: 1,
         clienteId: cliente.id,
-        dataCompra: new Date('2025-05-10T10:00:00Z'),
+        dataCompra: new Date('2025-06-10T09:00:00Z'),
         produtoId: produto1.id,
         formaPagamento: 'Cartão de Crédito',
-        status: 'Entregue',
+        status: 'pago',
         valorPago: produto1.preco,
-        dataEntrega: new Date('2025-05-15T18:00:00Z'),
-        notaFiscal: 'NF-00001',
-        dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
+        dataEntrega: new Date('2025-06-13T18:00:00Z'),
+        notaFiscal: 'NF-10001',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'),
         assinado: 'João Silva',
       },
       {
         quantidade: 2,
         clienteId: cliente.id,
-        dataCompra: new Date('2025-06-01T14:30:00Z'),
-        produtoId: produto11.id,
+        dataCompra: new Date('2025-06-11T14:00:00Z'),
+        produtoId: produto22.id,
         formaPagamento: 'Pix',
-        status: 'Enviado',
-        valorPago: Number(produto11.preco) * 2,
-        dataEntrega: new Date('2025-06-10T18:00:00Z'), // Entrega estimada
-        notaFiscal: 'NF-00002',
-        dataDevolucao: new Date('9999-12-31T23:59:59Z'), // Data placeholder para item não devolvido
-        assinado: 'Não assinado',
+        status: 'pago',
+        valorPago: Number(produto22.preco) * 2,
+        dataEntrega: new Date('2025-06-15T18:00:00Z'),
+        notaFiscal: 'NF-10002',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'),
+        assinado: 'João Silva',
+      },
+      {
+        quantidade: 1,
+        clienteId: cliente.id,
+        dataCompra: new Date('2025-06-13T16:45:00Z'),
+        produtoId: produto31.id,
+        formaPagamento: 'Boleto',
+        status: 'pago',
+        valorPago: produto31.preco,
+        dataEntrega: new Date('2025-06-16T18:00:00Z'),
+        notaFiscal: 'NF-10003',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'),
+        assinado: 'João Silva',
+      },
+
+      // ✅ MÊS (fora da semana)
+      {
+        quantidade: 1,
+        clienteId: cliente.id,
+        dataCompra: new Date('2025-05-20T11:20:00Z'),
+        produtoId: produto1.id,
+        formaPagamento: 'Pix',
+        status: 'pago',
+        valorPago: produto1.preco,
+        dataEntrega: new Date('2025-05-25T18:00:00Z'),
+        notaFiscal: 'NF-10004',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'),
+        assinado: 'João Silva',
+      },
+      {
+        quantidade: 2,
+        clienteId: cliente.id,
+        dataCompra: new Date('2025-05-28T13:15:00Z'),
+        produtoId: produto19.id,
+        formaPagamento: 'Cartão de Débito',
+        status: 'pago',
+        valorPago: Number(produto19.preco) * 2,
+        dataEntrega: new Date('2025-06-02T18:00:00Z'),
+        notaFiscal: 'NF-10005',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'),
+        assinado: 'João Silva',
+      },
+
+      // ❌ FORA DO MÊS
+      {
+        quantidade: 1,
+        clienteId: cliente.id,
+        dataCompra: new Date('2025-04-10T10:00:00Z'),
+        produtoId: produto1.id,
+        formaPagamento: 'Boleto',
+        status: 'pago',
+        valorPago: produto1.preco,
+        dataEntrega: new Date('2025-04-15T18:00:00Z'),
+        notaFiscal: 'NF-10006',
+        dataDevolucao: new Date('9999-12-31T23:59:59Z'),
+        assinado: 'João Silva',
       },
     ],
     skipDuplicates: true,

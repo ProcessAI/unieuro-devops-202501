@@ -1,177 +1,166 @@
 import { useEffect, useState } from 'react';
-import { useToast } from '@/components/ToastContext';
-import { Header } from '@/components/Header';
+import { AdminHeader } from '@/components/AdminHeader';
 import { Footer } from '@/components/Footer';
+import {
+  IconCircleCheck,
+  IconCircleX,
+  IconReceipt,
+} from '@tabler/icons-react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/pt-br';
 
-// NOVO: Define o tipo para um Pedido (simplificado)
-type Pedido = {
+dayjs.extend(relativeTime);
+dayjs.locale('pt-br');
+
+type StatusPedido = 'pago' | 'cancelado';
+
+type PedidoAPI = {
   id: number;
-  valor: number;
-  status: 'CONCLUIDO' | 'PENDENTE';
+  quantidade: number;
+  formaPagamento: string;
+  status: StatusPedido;
+  valorPago: string;
+  assinado: string;
+  dataCompra: string;
 };
 
-// ALTERADO: Cliente agora pode ter uma lista de pedidos
-type Cliente = {
-  id: number;
-  nome: string;
-  email: string;
-  cpf: string;
-  tipoConta: 'VAREJO' | 'ATACADO';
-  pedidos: Pedido[]; // Adicionado para simular os pedidos
+type RespostaPedidos = {
+  pedidos: PedidoAPI[];
 };
 
-// NOVO: Dados de exemplo (mock) para simular a resposta do backend
-// Alguns clientes têm pedidos, outros não.
-const mockClientes: Cliente[] = [
-  {
-    id: 1,
-    nome: 'Lorrana',
-    email: 'lorrana@example.com',
-    cpf: '111.111.111-11',
-    tipoConta: 'VAREJO',
-    pedidos: [
-      { id: 101, valor: 150.0, status: 'CONCLUIDO' },
-      { id: 102, valor: 200.0, status: 'CONCLUIDO' },
-    ],
-  },
-  {
-    id: 2,
-    nome: 'Esdras',
-    email: 'esdras@example.com',
-    cpf: '222.222.222-22',
-    tipoConta: 'VAREJO',
-    pedidos: [], // Este cliente ainda não tem pedidos
-  },
-  {
-    id: 3,
-    nome: 'Cliente Atacadista Aprovado',
-    email: 'aprovado@example.com',
-    cpf: '333.333.333-33',
-    tipoConta: 'ATACADO',
-    pedidos: [{ id: 103, valor: 1250.0, status: 'CONCLUIDO' }],
-  },
-    {
-    id: 4,
-    nome: 'Victor',
-    email: 'victor@example.com',
-    cpf: '444.444.444-44',
-    tipoConta: 'VAREJO',
-    pedidos: [{ id: 104, valor: 80.0, status: 'CONCLUIDO' }],
-  },
-];
-
-export default function PaginaClientes() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
+export default function PaginaPedidos() {
+  const [pedidos, setPedidos] = useState<PedidoAPI[]>([]);
   const [loading, setLoading] = useState(true);
-  const { showToast } = useToast();
 
-  // ALTERADO: Efeito para buscar os dados. Agora usa os dados mockados.
   useEffect(() => {
-    // Simula o carregamento da rede
-    setTimeout(() => {
-      setClientes(mockClientes);
-      setLoading(false);
-    }, 1000);
+    const fetchPedidos = async () => {
+      try {
+        const response = await fetch('/api/admin/pedidos-status', {
+          credentials: 'include',
+        });
+        const data: RespostaPedidos = await response.json();
 
-    /* // O fetch original foi comentado para usar os dados mockados.
-      // Quando seu backend estiver pronto para enviar os pedidos junto com os clientes,
-      // você pode remover o setTimeout acima e descomentar este bloco.
+        if (!Array.isArray(data.pedidos)) {
+          throw new Error("Formato inesperado da resposta da API.");
+        }
 
-      fetch('/api/admin/clientes')
-       .then((res) => {
-         if (!res.ok) {
-           throw new Error('Falha ao buscar clientes.');
-         }
-         return res.json();
-       })
-       .then((data) => {
-         setClientes(data.clientes);
-       })
-       .catch((error) => {
-         showToast(error.message, { duration: 6000 });
-       })
-       .finally(() => {
-         setLoading(false);
-       });
-    */
+        setPedidos(data.pedidos);
+      } catch (error) {
+        console.error('Erro ao buscar pedidos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPedidos();
   }, []);
 
-  const handleApprove = async (clienteId: number) => {
-    try {
-      // A lógica de request continua a mesma, mas a UI é atualizada otimisticamente.
-      showToast('Simulando aprovação...', { duration: 2000 });
-      
-      setClientes((prevClientes) =>
-        prevClientes.map((cliente) =>
-          cliente.id === clienteId ? { ...cliente, tipoConta: 'ATACADO' } : cliente
-        )
-      );
-      // Em um cenário real, você faria o fetch aqui e trataria a resposta.
-      // const res = await fetch(`/api/admin/clientes/${clienteId}/aprovar-atacado`, { method: 'PATCH' });
-      // ...
-    } catch {
-      showToast('Falha de rede na simulação.', { duration: 5000 });
+  const getStatusStyle = (status: StatusPedido) => {
+    switch (status) {
+      case 'pago':
+        return {
+          icon: <IconCircleCheck size={16} />,
+          className: 'bg-green-600 text-white',
+          label: 'Pago',
+        };
+      case 'cancelado':
+        return {
+          icon: <IconCircleX size={16} />,
+          className: 'bg-red-600 text-white',
+          label: 'Cancelado',
+        };
+      default:
+        return {
+          icon: <IconReceipt size={16} />,
+          className: 'bg-gray-500 text-white',
+          label: 'Desconhecido',
+        };
     }
+  };
+
+  const handleVerDetalhes = (pedidoId: number) => {
+    alert(`Lógica para ver detalhes do pedido #${pedidoId} ainda não implementada.`);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0D0705] text-white flex justify-center items-center">
-        <p>Carregando clientes...</p>
+        <p>Carregando pedidos...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0705] text-white">
-      <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Clientes</h1>
-        
-        <div className="bg-[#1A1615] rounded-lg shadow-lg overflow-hidden">
-          <table className="w-full text-left">
+    <div className="min-h-screen bg-[#130F0E] text-white flex flex-col">
+      <header className="bg-[#130F0E] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AdminHeader />
+        </div>
+      </header>
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Pedidos</h1>
+
+        <div className="bg-[#1A1615] rounded-lg shadow-lg overflow-x-auto">
+          <table className="w-full text-left min-w-[900px]">
             <thead>
               <tr className="border-b border-gray-700 bg-[#130F0E]">
-                <th className="p-4">Nome</th>
-                <th className="p-4">Email</th>
-                <th className="p-4">Status da Conta</th>
-                <th className="p-4 text-center">Pedidos Realizados</th> {/* NOVO: Coluna de pedidos */}
+                <th className="p-4">Pedido</th>
+                <th className="p-4">Cliente</th>
+                <th className="p-4 text-center">Itens</th>
+                <th className="p-4">Valor Total</th>
+                <th className="p-4">Pagamento</th>
+                <th className="p-4">Status</th>
                 <th className="p-4 text-center">Ação</th>
               </tr>
             </thead>
             <tbody>
-              {clientes.map((cliente) => (
-                <tr key={cliente.id} className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors">
-                  <td className="p-4">{cliente.nome}</td>
-                  <td className="p-4">{cliente.email}</td>
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        cliente.tipoConta === 'ATACADO'
-                          ? 'bg-green-600 text-white'
-                          : 'bg-blue-500 text-white'
-                      }`}
-                    >
-                      {cliente.tipoConta}
-                    </span>
-                  </td>
-                  {/* NOVO: Célula que mostra a contagem de pedidos */}
-                  <td className="p-4 text-center">{cliente.pedidos.length}</td>
-                  <td className="p-4 text-center">
-                    <button
-                      onClick={() => handleApprove(cliente.id)}
-                      // ALTERADO: Lógica de desativação do botão
-                      disabled={cliente.tipoConta === 'ATACADO' || cliente.pedidos.length === 0}
-                      className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:enabled:bg-[#C77714] transition"
-                    >
-                      {cliente.tipoConta === 'ATACADO' ? 'Aprovado' : 'Aprovar p/ Atacado'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {pedidos.map((pedido) => {
+                const statusStyle = getStatusStyle(pedido.status);
+                return (
+                  <tr
+                    key={pedido.id}
+                    className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors"
+                  >
+                    <td className="p-4 font-bold">
+                      <div>#{pedido.id}</div>
+                      <div className="text-xs text-gray-400">
+                        {dayjs(pedido.dataCompra).fromNow()}
+                      </div>
+                    </td>
+                    <td className="p-4">{pedido.assinado}</td>
+                    <td className="p-4 text-center">{pedido.quantidade}</td>
+                    <td className="p-4 font-mono">
+                      {Number(pedido.valorPago).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      })}
+                    </td>
+                    <td className="p-4">
+                      {pedido.formaPagamento.toUpperCase()}
+                    </td>
+                    <td className="p-4">
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold w-fit ${statusStyle.className}`}
+                      >
+                        {statusStyle.icon}
+                        <span>{statusStyle.label}</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-center">
+                      <button
+                        onClick={() => handleVerDetalhes(pedido.id)}
+                        className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition"
+                      >
+                        Ver Detalhes
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
-          </table> 
-        </div> 
+          </table>
+        </div>
       </main>
       <Footer />
     </div>

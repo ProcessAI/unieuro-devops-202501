@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Cliente" ALTER COLUMN "verificado" SET DEFAULT true;
