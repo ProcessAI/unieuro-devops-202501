@@ -36,7 +36,7 @@ export default function PaginaPedidos() {
   useEffect(() => {
     const fetchPedidos = async () => {
       try {
-        const response = await fetch('http://localhost:3333/admin/pedidos-status', {
+        const response = await fetch('/api/admin/pedidos-status', {
           credentials: 'include',
         });
         const data: RespostaPedidos = await response.json();
@@ -92,8 +92,12 @@ export default function PaginaPedidos() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0705] text-white flex flex-col">
-      <Header />
+    <div className="min-h-screen bg-[#130F0E] text-white flex flex-col">
+      <header className="bg-[#130F0E] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Header />
+        </div>
+      </header>
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Pedidos</h1>
 
