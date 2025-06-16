@@ -53,6 +53,7 @@ export function Header() {
         {/* Botão Coração */}
         <Link
           href=""
+          title="Favoritos"
           className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
         >
           <IconHeart size={20} />
@@ -61,6 +62,7 @@ export function Header() {
         {/* Botão Carrinho */}
         <Link
           href="/cart"
+          title="Carrinho"
           className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
         >
           <IconShoppingCart size={20} />
@@ -69,6 +71,7 @@ export function Header() {
         {/* Botão Usuário */}
         <Link
           href=""
+          title="Perfil"
           className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
         >
           <IconUser size={20} />
