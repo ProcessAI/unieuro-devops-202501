@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -230,6 +231,7 @@ async function main() {
       },
     ],
     skipDuplicates: true,
+    skipDuplicates: true,
   });
 
   // Produtos de Moda
@@ -238,6 +240,8 @@ async function main() {
       {
         nome: 'Jaqueta Jeans Masculina Slim',
         descricao: 'Jaqueta jeans com corte slim e lavagem moderna',
+        preco: 179.9,
+        precoOriginal: 229.9,
         preco: 179.9,
         precoOriginal: 229.9,
         frete: 22,
@@ -259,6 +263,8 @@ async function main() {
         descricao: 'Vestido leve e elegante, ideal para o verão',
         preco: 139.9,
         precoOriginal: 169.9,
+        preco: 139.9,
+        precoOriginal: 169.9,
         frete: 18,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -276,6 +282,8 @@ async function main() {
       {
         nome: 'Tênis Esportivo Unissex Corrida Pro',
         descricao: 'Tênis leve com amortecimento para corrida e academia',
+        preco: 249.9,
+        precoOriginal: 299.9,
         preco: 249.9,
         precoOriginal: 299.9,
         frete: 24,
@@ -297,6 +305,8 @@ async function main() {
         descricao: 'Blusa elegante com tecido confortável',
         preco: 69.9,
         precoOriginal: 89.9,
+        preco: 69.9,
+        precoOriginal: 89.9,
         frete: 12,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -314,6 +324,8 @@ async function main() {
       {
         nome: 'Camisa Social Masculina Slim Fit',
         descricao: 'Camisa elegante com tecido de alta qualidade',
+        preco: 119.9,
+        precoOriginal: 149.9,
         preco: 119.9,
         precoOriginal: 149.9,
         frete: 15,
@@ -335,6 +347,8 @@ async function main() {
         descricao: 'Modelagem que valoriza a silhueta com elastano',
         preco: 129.9,
         precoOriginal: 159.9,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 16,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -352,6 +366,8 @@ async function main() {
       {
         nome: 'Casaco Moletom Masculino com Capuz',
         descricao: 'Ideal para dias frios com bolso frontal',
+        preco: 99.9,
+        precoOriginal: 129.9,
         preco: 99.9,
         precoOriginal: 129.9,
         frete: 20,
@@ -373,6 +389,8 @@ async function main() {
         descricao: 'Proteção total contra raios UV e visual moderno',
         preco: 79.9,
         precoOriginal: 109.9,
+        preco: 79.9,
+        precoOriginal: 109.9,
         frete: 10,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -390,6 +408,8 @@ async function main() {
       {
         nome: 'Bolsa Feminina Transversal Couro Sintético',
         descricao: 'Compacta, elegante e prática para o dia a dia',
+        preco: 109.9,
+        precoOriginal: 139.9,
         preco: 109.9,
         precoOriginal: 139.9,
         frete: 14,
@@ -411,6 +431,8 @@ async function main() {
         descricao: 'Resistente à água, com cronômetro e luz de LED',
         preco: 89.9,
         precoOriginal: 119.9,
+        preco: 89.9,
+        precoOriginal: 119.9,
         frete: 11,
         ativo: true,
         categoriaId: categoriaModa.id,
@@ -427,6 +449,7 @@ async function main() {
       },
     ],
     skipDuplicates: true,
+    skipDuplicates: true,
   });
 
   // Produtos de Casa e Decoração
@@ -435,6 +458,8 @@ async function main() {
       {
         nome: 'Luminária de Mesa Vintage',
         descricao: 'Luminária com design retrô e luz regulável',
+        preco: 149.9,
+        precoOriginal: 189.9,
         preco: 149.9,
         precoOriginal: 189.9,
         frete: 20,
@@ -456,6 +481,8 @@ async function main() {
         descricao: 'Almofadas com estampas modernas e confortáveis',
         preco: 99.9,
         precoOriginal: 129.9,
+        preco: 99.9,
+        precoOriginal: 129.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -473,6 +500,8 @@ async function main() {
       {
         nome: 'Vaso Cerâmico Branco',
         descricao: 'Vaso elegante para plantas ou decoração',
+        preco: 79.9,
+        precoOriginal: 99.9,
         preco: 79.9,
         precoOriginal: 99.9,
         frete: 18,
@@ -494,6 +523,8 @@ async function main() {
         descricao: 'Relógio moderno com design clean e silencioso',
         preco: 129.9,
         precoOriginal: 159.9,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 20,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -511,6 +542,8 @@ async function main() {
       {
         nome: 'Castiçal de Metal Dourado',
         descricao: 'Castiçal elegante para velas decorativas',
+        preco: 59.9,
+        precoOriginal: 79.9,
         preco: 59.9,
         precoOriginal: 79.9,
         frete: 12,
@@ -532,6 +565,8 @@ async function main() {
         descricao: 'Tapete macio com design geométrico moderno',
         preco: 299.9,
         precoOriginal: 349.9,
+        preco: 299.9,
+        precoOriginal: 349.9,
         frete: 40,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -549,6 +584,8 @@ async function main() {
       {
         nome: 'Espelho Decorativo Redondo',
         descricao: 'Espelho com moldura dourada para sala ou quarto',
+        preco: 199.9,
+        precoOriginal: 249.9,
         preco: 199.9,
         precoOriginal: 249.9,
         frete: 30,
@@ -570,6 +607,8 @@ async function main() {
         descricao: 'Cortina bloqueia luz, ideal para quartos',
         preco: 249.9,
         precoOriginal: 299.9,
+        preco: 249.9,
+        precoOriginal: 299.9,
         frete: 35,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -587,6 +626,8 @@ async function main() {
       {
         nome: 'Prateleira Flutuante',
         descricao: 'Prateleira em MDF para organização e decoração',
+        preco: 129.9,
+        precoOriginal: 159.9,
         preco: 129.9,
         precoOriginal: 159.9,
         frete: 25,
@@ -608,6 +649,8 @@ async function main() {
         descricao: 'Conjunto elegante para ocasiões especiais',
         preco: 179.9,
         precoOriginal: 219.9,
+        preco: 179.9,
+        precoOriginal: 219.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaCasaDeco.id,
@@ -624,8 +667,10 @@ async function main() {
       },
     ],
     skipDuplicates: true,
+    skipDuplicates: true,
   });
 
+  // Produtos de Beleza
   // Produtos de Beleza
   await prisma.produto.createMany({
     data: [
@@ -651,6 +696,8 @@ async function main() {
       {
         nome: 'Prancha Alisadora Nano Titanium',
         descricao: 'Alisa com precisão e brilho, indicada para todos os tipos de cabelo',
+        preco: 279.9,
+        precoOriginal: 319.9,
         preco: 279.9,
         precoOriginal: 319.9,
         frete: 25,
@@ -691,6 +738,8 @@ async function main() {
         descricao: 'Limpeza, hidratação e tonificação com produtos dermatologicamente testados',
         preco: 139.9,
         precoOriginal: 169.9,
+        preco: 139.9,
+        precoOriginal: 169.9,
         frete: 15,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -708,6 +757,8 @@ async function main() {
       {
         nome: 'Aparador de Pelos Facial Recarregável',
         descricao: 'Remoção delicada de pelos com acabamento suave e indolor',
+        preco: 89.9,
+        precoOriginal: 119.9,
         preco: 89.9,
         precoOriginal: 119.9,
         frete: 12,
@@ -748,6 +799,8 @@ async function main() {
         descricao: 'Depilação suave e eficaz com tecnologia de proteção da pele',
         preco: 129.9,
         precoOriginal: 159.9,
+        preco: 129.9,
+        precoOriginal: 159.9,
         frete: 16,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -786,6 +839,8 @@ async function main() {
         descricao: 'Reduz linhas de expressão e hidrata profundamente',
         preco: 59.9,
         precoOriginal: 79.9,
+        preco: 59.9,
+        precoOriginal: 79.9,
         frete: 10,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -805,6 +860,8 @@ async function main() {
         descricao: 'Escova alisadora com tecnologia para anti-frizz',
         preco: 189.9,
         precoOriginal: 229.9,
+        preco: 189.9,
+        precoOriginal: 229.9,
         frete: 22,
         ativo: true,
         categoriaId: categoriaBeleza.id,
@@ -820,6 +877,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
     ],
+    skipDuplicates: true,
     skipDuplicates: true,
   });
 

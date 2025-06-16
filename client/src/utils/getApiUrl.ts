@@ -1,5 +1,5 @@
 const isDevelopment = false
-const prodUrl = "https://a.a"
+const prodUrl = "https://atacanet.com.br"
 const devUrl = "http://localhost:3333"
 
 export const apiUrl = () => {

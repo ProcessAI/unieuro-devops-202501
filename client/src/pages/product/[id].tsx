@@ -34,6 +34,22 @@ interface ProdutoPageProps {
 export default function Produto({ produto }: ProdutoPageProps) {
   const primeiraImagem = produto.Midias[0]?.link || '/placeholder.png';
 
+  const handleAddToCart = () => {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingProductIndex = cart.findIndex((item: any) => item.id === produto.id);
+
+    if (existingProductIndex !== -1) {
+      cart[existingProductIndex].quantity += 1;
+    } else {
+      cart.push({
+        id: produto.id,
+        quantity: 1,
+      });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+  };
+
   return (
     <div className="min-h-screen bg-[#130F0E] text-white">
       <header className="bg-[#130F0E] shadow-sm">
@@ -45,7 +61,6 @@ export default function Produto({ produto }: ProdutoPageProps) {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-         
           <div className="rounded-lg overflow-hidden shadow-lg">
             <Image
               src={primeiraImagem}
@@ -84,7 +99,10 @@ export default function Produto({ produto }: ProdutoPageProps) {
               </p>
             </div>
 
-            <button className="bg-[#DF9829] hover:bg-yellow-600 text-black font-semibold py-3 px-6 rounded-lg cursor-pointer transition duration-300">
+            <button
+              onClick={handleAddToCart}
+              className="bg-[#DF9829] hover:bg-yellow-600 text-black font-semibold py-3 px-6 rounded-lg cursor-pointer transition duration-300"
+            >
               Adicionar ao carrinho
             </button>
           </div>

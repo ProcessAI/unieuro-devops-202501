@@ -7,11 +7,12 @@ const publicRoutes = [
   { path: '/forgot-password', whenAuthenticated: 'redirect' },
   { path: /^\/reset-password(?:\/.*)?$/, whenAuthenticated: 'redirect' },
   { path: '/pricing', whenAuthenticated: 'next' },
-  { path: '/dashboard', whenAuthenticated: 'next' },
   { path: '/', whenAuthenticated: 'next' },
+  { path: '/cart', whenAuthenticated: 'next' },
   { path: '/product-search', whenAuthenticated: 'next' },
   { path: /^\/product\//, whenAuthenticated: 'next' },
   { path: /^\/pedido\//, whenAuthenticated: 'next' },
+  // { path: "/admin/aprove-orders", whenAuthenticated: "next" },
   { path: /^\/verify-email(?:\/.*)?$/, whenAuthenticated: 'next' },
 ];
 

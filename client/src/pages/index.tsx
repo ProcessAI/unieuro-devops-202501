@@ -68,14 +68,16 @@ export default function Home() {
         <div className="grid grid-cols-5 gap-6">
           {ofertas.length > 0 ? (
             ofertas.map((produto) => (
-              <ProductCard
-                key={produto.id}
-                image={produto.image || 'https://via.placeholder.com/150'}
-                price={produto.preco.toFixed(2).replace('.', ',')}
-                originalPrice={produto.precoOriginal.toFixed(2).replace('.', ',')}
-                discount={produto.desconto}
-                minQuantity={produto.minQuantity}
-              />
+              <Link href={`/product/${produto.id}`}>
+                <ProductCard
+                  key={produto.id}
+                  image={produto.image || 'https://via.placeholder.com/150'}
+                  price={produto.preco.toFixed(2).replace('.', ',')}
+                  originalPrice={produto.precoOriginal.toFixed(2).replace('.', ',')}
+                  discount={produto.desconto}
+                  minQuantity={produto.minQuantity}
+                />
+              </Link>
             ))
           ) : (
             <p className="text-white col-span-5 text-center">Nenhuma oferta disponível no momento.</p>
