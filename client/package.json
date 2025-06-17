@@ -9,6 +9,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@prisma/client": "^6.9.0",
     "@tabler/icons-react": "^3.31.0",
     "axios": "^1.8.3",
     "dayjs": "^1.11.13",
@@ -30,6 +31,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "prettier": "^3.5.3",
+    "prisma": "^6.9.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
