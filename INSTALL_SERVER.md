@@ -71,6 +71,8 @@ nano defaul
 /etc/letsencrypt/live/www.atacanet.com.br/privkey.pem
 ```
 
+f1
+
 ### 10- Salvar as alterações e rodar o comando para reiniciar o nginx:
 
 ```bash
