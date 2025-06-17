@@ -627,7 +627,6 @@ async function main() {
   });
 
   // Produtos de Beleza
-  // Produtos de Beleza
   await prisma.produto.createMany({
     data: [
       {
@@ -1196,16 +1195,14 @@ async function main() {
     });
 
     console.log('Cliente e Pedidos semeados com sucesso!');
-  } else {
-    console.error('Produtos necessários não encontrados.');
   }
-
-  main()
-    .catch((e) => {
-      console.error(e);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
 }
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
