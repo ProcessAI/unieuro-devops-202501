@@ -18,7 +18,7 @@ const LineChart: React.FC = () => {
       .catch((err) => console.error('Erro ao carregar vendas mensais:', err));
   }, []);
 
-  const totalVendas = data.reduce((acc, curr) => acc + curr.value, 0);
+  const totalVendas = data.reduce((acc, curr:any) => acc + curr.value, 0);
   const totalPedidos = data.length;
 
   return (

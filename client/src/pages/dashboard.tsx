@@ -8,7 +8,7 @@ import PieChart from '../components/PieChart';
 import OrdersTable from '../components/OrdersTable';
 import { BanknoteArrowUp, Package } from 'lucide-react';
 
-const Dashboard = ({ stats }) => {
+const Dashboard = ({ stats }: any) => {
   if (!stats) return <p className="text-white">Erro ao carregar dados do dashboard.</p>;
 
   return (
@@ -73,7 +73,7 @@ const Dashboard = ({ stats }) => {
   );
 };
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: any) {
   const protocolo = process.env.NODE_ENV === 'production' ? 'https' : 'http';
   const host = context.req.headers.host;
   const url = `${protocolo}://${host}/api/dashboard/estatisticas`;
