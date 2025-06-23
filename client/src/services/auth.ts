@@ -17,6 +17,17 @@ export const login = async (email: string, senha: string) => {
   return response.data;
 };
 
+// função para o login de admin
+export const adminLogin = async (email: string, senha: string) => {
+  const response = await API.post('/admin/login', { email, senha });
+  if (response.status === 200) {
+    const { accessToken, refreshToken } = response.data;
+    document.cookie = `accessToken=${accessToken}; path=/;`;
+    document.cookie = `refreshToken=${refreshToken}; path=/;`;
+  }
+  return response.data;
+};
+
 export const refreshAccessToken = async () => {
   return API.post('/refresh');
 };

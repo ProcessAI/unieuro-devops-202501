@@ -498,6 +498,54 @@ app.post('/webhook', async (req: any, res: any) => {
   }
 });
 
+app.post('/admin/login', async (req: any, res: any) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: 'E-mail e senha são obrigatórios.' });
+  }
+
+  try {
+    const adminUserEmail = process.env.ADMIN_EMAIL || "admin@atacanet.com.br";
+    if (email !== adminUserEmail) {
+        return res.status(404).json({ message: 'Credenciais de administrador inválidas.' });
+    }
+
+    const clienteAsAdmin = await prisma.cliente.findUnique({ where: { email } });
+
+    if (!clienteAsAdmin) {
+      return res.status(404).json({ message: 'Administrador não cadastrado.' });
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, clienteAsAdmin.senha);
+    if (!senhaCorreta) {
+      return res.status(401).json({ message: 'Senha incorreta.' });
+    }
+
+    // Adicione uma propriedade 'role' ou 'nivel' para diferenciar o token
+    const accessToken = jwt.sign(
+      { id: clienteAsAdmin.id, email: clienteAsAdmin.email, role: 'admin' },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: '1h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: clienteAsAdmin.id, email: clienteAsAdmin.email, role: 'admin' },
+      process.env.REFRESH_TOKEN_SECRET!,
+      { expiresIn: '365d' }
+    );
+
+    return res.status(200).json({
+      message: 'Login administrativo realizado com sucesso.',
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro no login administrativo.' });
+  }
+});
+
 app.post('/login', async (req: any, res: any) => {
   const { email, senha } = req.body;
 
@@ -977,6 +1025,28 @@ app.get('/produto/:id', async (req: Request, res: Response) => {
     console.error(err);
     return res.sendError('Erro ao buscar produto.', 500);
   }
+});
+
+// ROTA PARA BUSCAR CATEGORIAS
+app.get('/admin/categorias', isAdminAuthenticated, async (req: Request, res: Response) => {
+    try {
+        const categorias = await prisma.categoria.findMany();
+        res.sendSuccess(categorias);
+    } catch (err: any) {
+        console.error('Erro ao buscar categorias:', err);
+        res.sendError(`Erro de Base de Dados: ${err.message}`);
+    }
+});
+
+// ROTA PARA BUSCAR MARCAS
+app.get('/admin/marcas', isAdminAuthenticated, async (req: Request, res: Response) => {
+    try {
+        const marcas = await prisma.marca.findMany();
+        res.sendSuccess(marcas);
+    } catch (err: any) {
+        console.error('Erro ao buscar marcas:', err);
+        res.sendError(`Erro de Base de Dados: ${err.message}`);
+    }
 });
 
 // [R]EAD - Obter todos os produtos

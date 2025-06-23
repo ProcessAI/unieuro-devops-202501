@@ -28,6 +28,11 @@ export function Footer() {
                   Privacidade
                 </a>
               </li>
+              <li>
+                <a href="/admin/login" className="text-white hover:text-[#C77714]">
+                  Área Administrativa
+                </a>
+              </li>
             </ul>
           </div>
           <div>

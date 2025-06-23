@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
-import { login } from '../../services/auth';
+import { adminLogin } from '../../services/auth';
 import { useRouter } from 'next/router';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
 import { useToast } from '@/components/ToastContext';
@@ -16,7 +16,7 @@ export default function AdminLogin() {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await login(email, password);
+      const data = await adminLogin(email, password);
       const { accessToken, refreshToken, message } = data;
       
       if (!accessToken || !refreshToken) {
