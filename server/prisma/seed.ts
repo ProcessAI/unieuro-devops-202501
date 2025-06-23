@@ -1193,9 +1193,24 @@ async function main() {
       ],
       skipDuplicates: true,
     });
-
-    console.log('Cliente e Pedidos semeados com sucesso!');
   }
+  console.log('Cliente e Pedidos semeados com sucesso!');
+  
+  const adminUser = await prisma.cliente.upsert({
+    where: { email: 'admin@atacanet.com.br' },
+    update: {},
+    create: {
+      nome: 'Administrador',
+      email: 'admin@atacanet.com.br',
+      telefone: '00000000000',
+      senha: passwordHash, // Reutiliza a senha 'senha123'
+      dataNascimento: new Date('1990-01-01T00:00:00Z'),
+      cpf: '000.000.000-00',
+      ativo: true,
+      verificado: true, // Já cria o admin como verificado
+    },
+  });
+  console.log(`✅ Usuário Administrador "${adminUser.nome}" (ID: ${adminUser.id}) está pronto.`);
 }
 
 main()
