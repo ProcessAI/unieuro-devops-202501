@@ -35,11 +35,13 @@ export function Header() {
   return (
     <div className="flex items-center justify-between h-16">
       <div className="flex items-center">
-        <img
-          src="/logoAtacanetHorizontalSimples.svg"
-          alt="Atacanet Logo"
-          className="h-8 w-auto mr-2"
-        />
+        <Link href="/">
+          <img
+            src="/logoAtacanetHorizontalSimples.svg"
+            alt="Atacanet Logo"
+            className="h-8 w-auto mr-2"
+          />
+        </Link>
       </div>
 
       <div className="flex-1 max-w-2xl mx-8">
@@ -57,13 +59,13 @@ export function Header() {
 
       <div className="flex items-center gap-1 sm:gap-3">
         {/* Botão Coração */}
-        <Link
+        {/* <Link
           href=""
           title="Favoritos"
           className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
         >
           <IconHeart size={20} />
-        </Link>
+        </Link> */}
 
         {/* Botão Carrinho */}
         <Link
@@ -80,13 +82,13 @@ export function Header() {
         </Link>
 
         {/* Botão Usuário */}
-        <Link
+        {/* <Link
           href=""
           title="Perfil"
           className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
         >
           <IconUser size={20} />
-        </Link>
+        </Link> */}
 
         {/* Botão Entrar */}
         {!isLogged ? (

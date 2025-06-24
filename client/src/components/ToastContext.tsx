@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useCallback, useEffect, useState } from 'react';
 
 type ToastOptions = { duration?: number };
 type ToastContextType = {
@@ -14,9 +8,7 @@ type ToastContextType = {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 let idCounter = 0;
 
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toast, setToast] = useState<{
     id: number;
     content: React.ReactNode;
@@ -47,12 +39,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
 
       {toast && (
-        <div className="fixed inset-x-0 top-5 flex justify-center z-50">
-          <div className="relative bg-[#1a1615] text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-4">
+        <div className="fixed inset-x-0 top-5 flex justify-center z-50 pointer-events-none">
+          <div className="relative bg-yellow-400 text-black px-4 py-3 rounded-lg shadow-lg flex items-center space-x-4 pointer-events-auto">
             {toast.content}
             <button
               onClick={() => setToast(null)}
-              className="absolute top-1 right-1 text-white hover:text-gray-400 cursor-pointer"
+              className="absolute top-1 right-1 text-black hover:text-gray-400 cursor-pointer"
             >
               ×
             </button>

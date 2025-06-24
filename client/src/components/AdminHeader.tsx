@@ -29,11 +29,13 @@ export function AdminHeader() {
   return (
     <div className="flex items-center justify-between h-16">
       <div className="flex items-center">
-        <img
-          src="/logoAtacanetHorizontalSimples.svg"
-          alt="Atacanet Logo"
-          className="h-8 w-auto mr-2"
-        />
+        <Link href="/">
+          <img
+            src="/logoAtacanetHorizontalSimples.svg"
+            alt="Atacanet Logo"
+            className="h-8 w-auto mr-2"
+          />
+        </Link>
       </div>
 
 

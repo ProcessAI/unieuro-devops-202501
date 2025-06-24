@@ -1,9 +1,9 @@
-// client/src/pages/product/[id].tsx
 import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import { Header } from '@/components/Header';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { useToast } from '@/components/ToastContext';
 
 interface Avaliacao {
   id: number;
@@ -32,6 +32,7 @@ interface ProdutoPageProps {
 }
 
 export default function Produto({ produto }: ProdutoPageProps) {
+  const { showToast } = useToast();
   const primeiraImagem = produto.Midias[0]?.link || '/placeholder.png';
 
   const handleAddToCart = () => {
@@ -48,6 +49,7 @@ export default function Produto({ produto }: ProdutoPageProps) {
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));
+    showToast('Item adicionado ao carrinho!');
   };
 
   return (

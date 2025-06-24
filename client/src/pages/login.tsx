@@ -51,11 +51,7 @@ export default function Login() {
           <span>E-mail não verificado! Por favor, valide sua conta antes de entrar.</span>
           <button
             onClick={resend}
-            className="
-          bg-[#DF9829] hover:bg-[#C77714]
-          text-black font-semibold
-          px-4 py-1 rounded-md cursor-pointer
-        "
+            className="bg-black hover:bg-[#333333] text-[#DF9829] font-semibold px-4 py-1 rounded-md cursor-pointer"
           >
             Reenviar
           </button>

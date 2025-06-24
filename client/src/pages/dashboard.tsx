@@ -64,8 +64,7 @@ const Dashboard = ({ stats }: any) => {
           <PieChart />
         </div>
 
-        <div className="px-4 sm:px-6 lg:px-8 py-12">
-          <OrdersTable /> {/* Preciso da lógica de pedidos pronta */}
+        <div className="px-4 sm:px-6 lg:px-8 pb-12">
         </div>
       </div>
       <Footer />
