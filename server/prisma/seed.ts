@@ -39,6 +39,7 @@ async function main() {
   await prisma.produto.createMany({
     data: [
       {
+        id: 1,
         nome: 'Fone Gamer XYZ',
         descricao: 'Fone com som surround',
         preco: 799.99,
@@ -58,6 +59,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 2,
         nome: 'Smartphone ABC',
         descricao: 'Smartphone com câmera 108MP',
         preco: 1599.99,
@@ -77,6 +79,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 3,
         nome: 'Notebook Ultra X',
         descricao: 'Notebook com tela 4K e processador i9',
         preco: 4999.99,
@@ -96,6 +99,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 4,
         nome: 'TV 4K OLED 55"',
         descricao: 'Televisão com painel OLED e resolução 4K',
         preco: 3499.99,
@@ -115,6 +119,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 5,
         nome: 'Caixa de Som Bluetooth BassX',
         descricao: 'Caixa de som potente com graves reforçados',
         preco: 299.99,
@@ -134,6 +139,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 6,
         nome: 'Roteador Wi-Fi 6 TurboNet',
         descricao: 'Roteador com suporte a Wi-Fi 6 e alta velocidade',
         preco: 399.99,
@@ -153,6 +159,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 7,
         nome: 'Webcam Full HD ProCam',
         descricao: 'Webcam com microfone embutido e 1080p',
         preco: 199.99,
@@ -172,6 +179,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 8,
         nome: 'Monitor Gamer 27" Curvo',
         descricao: 'Monitor curvo com taxa de atualização de 165Hz e 1ms de resposta',
         preco: 1899.99,
@@ -191,6 +199,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 9,
         nome: 'Console GameStation 5',
         descricao: 'Console de última geração com SSD ultra-rápido e gráficos realistas',
         preco: 4499.99,
@@ -210,6 +219,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 10,
         nome: 'Drone Cam 4K Pro',
         descricao: 'Drone com câmera 4K, GPS e estabilizador de imagem',
         preco: 2299.99,
@@ -236,6 +246,7 @@ async function main() {
   await prisma.produto.createMany({
     data: [
       {
+        id: 11,
         nome: 'Jaqueta Jeans Masculina Slim',
         descricao: 'Jaqueta jeans com corte slim e lavagem moderna',
         preco: 179.9,
@@ -255,6 +266,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 12,
         nome: 'Vestido Longo Floral Feminino',
         descricao: 'Vestido leve e elegante, ideal para o verão',
         preco: 139.9,
@@ -274,6 +286,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 13,
         nome: 'Tênis Esportivo Unissex Corrida Pro',
         descricao: 'Tênis leve com amortecimento para corrida e academia',
         preco: 249.9,
@@ -293,6 +306,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 14,
         nome: 'Blusa Canelada Gola Alta Feminina',
         descricao: 'Blusa elegante com tecido confortável',
         preco: 69.9,
@@ -312,6 +326,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 15,
         nome: 'Camisa Social Masculina Slim Fit',
         descricao: 'Camisa elegante com tecido de alta qualidade',
         preco: 119.9,
@@ -331,6 +346,7 @@ async function main() {
         quantidadeVarejo: 3,
       },
       {
+        id: 16,
         nome: 'Calça Jeans Skinny Feminina',
         descricao: 'Modelagem que valoriza a silhueta com elastano',
         preco: 129.9,
@@ -350,6 +366,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 17,
         nome: 'Casaco Moletom Masculino com Capuz',
         descricao: 'Ideal para dias frios com bolso frontal',
         preco: 99.9,
@@ -369,6 +386,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 18,
         nome: 'Óculos de Sol Estilo Aviador UV400',
         descricao: 'Proteção total contra raios UV e visual moderno',
         preco: 79.9,
@@ -388,6 +406,7 @@ async function main() {
         quantidadeVarejo: 4,
       },
       {
+        id: 19,
         nome: 'Bolsa Feminina Transversal Couro Sintético',
         descricao: 'Compacta, elegante e prática para o dia a dia',
         preco: 109.9,
@@ -407,6 +426,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 20,
         nome: 'Relógio Digital Masculino Esportivo',
         descricao: 'Resistente à água, com cronômetro e luz de LED',
         preco: 89.9,
@@ -433,6 +453,7 @@ async function main() {
   await prisma.produto.createMany({
     data: [
       {
+        id: 21,
         nome: 'Luminária de Mesa Vintage',
         descricao: 'Luminária com design retrô e luz regulável',
         preco: 149.9,
@@ -452,6 +473,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 22,
         nome: 'Conjunto de Almofadas Decorativas 4 Peças',
         descricao: 'Almofadas com estampas modernas e confortáveis',
         preco: 99.9,
@@ -471,6 +493,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 23,
         nome: 'Vaso Cerâmico Branco',
         descricao: 'Vaso elegante para plantas ou decoração',
         preco: 79.9,
@@ -490,6 +513,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 24,
         nome: 'Relógio de Parede Minimalista',
         descricao: 'Relógio moderno com design clean e silencioso',
         preco: 129.9,
@@ -509,6 +533,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 25,
         nome: 'Castiçal de Metal Dourado',
         descricao: 'Castiçal elegante para velas decorativas',
         preco: 59.9,
@@ -528,6 +553,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 26,
         nome: 'Tapete Decorativo',
         descricao: 'Tapete macio com design geométrico moderno',
         preco: 299.9,
@@ -547,6 +573,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 27,
         nome: 'Espelho Decorativo Redondo',
         descricao: 'Espelho com moldura dourada para sala ou quarto',
         preco: 199.9,
@@ -566,6 +593,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 28,
         nome: 'Cortina Blackout',
         descricao: 'Cortina bloqueia luz, ideal para quartos',
         preco: 249.9,
@@ -585,6 +613,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 29,
         nome: 'Prateleira Flutuante',
         descricao: 'Prateleira em MDF para organização e decoração',
         preco: 129.9,
@@ -604,6 +633,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 30,
         nome: 'Jogo de Taças Cristal 6 Peças',
         descricao: 'Conjunto elegante para ocasiões especiais',
         preco: 179.9,
@@ -630,6 +660,7 @@ async function main() {
   await prisma.produto.createMany({
     data: [
       {
+        id: 31,
         nome: 'Secador Íon Pro 2000W',
         descricao: 'Secador de cabelo com tecnologia de íons, protege os fios do calor excessivo',
         preco: 199.99,
@@ -649,6 +680,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 32,
         nome: 'Prancha Alisadora Nano Titanium',
         descricao: 'Alisa com precisão e brilho, indicada para todos os tipos de cabelo',
         preco: 279.9,
@@ -668,6 +700,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 33,
         nome: 'Escova Secadora 4 em 1',
         descricao: 'Modela, alisa, seca e dá volume com uma única escova elétrica',
         preco: 169.99,
@@ -687,6 +720,7 @@ async function main() {
         quantidadeVarejo: 3,
       },
       {
+        id: 34,
         nome: 'Kit Skincare Completo',
         descricao: 'Limpeza, hidratação e tonificação com produtos dermatologicamente testados',
         preco: 139.9,
@@ -706,6 +740,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 35,
         nome: 'Aparador de Pelos Facial Recarregável',
         descricao: 'Remoção delicada de pelos com acabamento suave e indolor',
         preco: 89.9,
@@ -725,6 +760,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 36,
         nome: 'Massageador Facial Sônico',
         descricao: 'Estimula a circulação e promove a absorção de produtos faciais',
         preco: 149.99,
@@ -744,6 +780,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 37,
         nome: 'Depilador Elétrico Feminino',
         descricao: 'Depilação suave e eficaz com tecnologia de proteção da pele',
         preco: 129.9,
@@ -763,6 +800,7 @@ async function main() {
         quantidadeVarejo: 1,
       },
       {
+        id: 38,
         nome: 'Kit Maquiagem Profissional',
         descricao: 'Paleta com sombras, blush, iluminador e pó compacto para todos os tons',
         preco: 119.99,
@@ -782,6 +820,7 @@ async function main() {
         quantidadeVarejo: 3,
       },
       {
+        id: 39,
         nome: 'Creme Antissinais com Retinol 50g',
         descricao: 'Reduz linhas de expressão e hidrata profundamente',
         preco: 59.9,
@@ -801,6 +840,7 @@ async function main() {
         quantidadeVarejo: 2,
       },
       {
+        id: 40,
         nome: 'Escova de Cabelo Anti-Frizz',
         descricao: 'Escova alisadora com tecnologia para anti-frizz',
         preco: 189.9,
@@ -825,157 +865,203 @@ async function main() {
 
   await prisma.midia.createMany({
     data: [
-      { link: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', produtoId: 1 },
-      { link: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12', produtoId: 2 },
+      { 
+        id: 1,
+        link: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', 
+        produtoId: 1 
+      },
+      { 
+        id: 2,
+        link: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12', 
+        produtoId: 2 
+      },
       {
+        id: 3,
         link: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1640&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 3,
       },
       {
+        id: 4,
         link: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 4,
       },
       {
+        id: 5,
         link: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 5,
       },
       {
+        id: 6,
         link: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 6,
       },
       {
+        id: 7,
         link: 'https://images.unsplash.com/photo-1636569826709-8e07f6104992?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 7,
       },
       {
+        id: 8,
         link: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=1684&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 8,
       },
       {
+        id: 9,
         link: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/PlayStation_5_and_DualSense.jpg/500px-PlayStation_5_and_DualSense.jpg?20201130152557',
         produtoId: 9,
       },
       {
+        id: 10,
         link: 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 10,
       },
       {
+        id: 11,
         link: 'https://images.unsplash.com/photo-1549108949-89cd83414d5a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 11,
       },
       {
+        id: 12,
         link: 'https://images.unsplash.com/photo-1658955924468-a4ee5fa6aeb6?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 12,
       },
       {
+        id: 13,
         link: 'https://images.unsplash.com/photo-1559743345-60e0907c4853?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 13,
       },
       {
+        id: 14,
         link: 'https://images.unsplash.com/photo-1597582927786-bae43be837a0?q=80&w=1885&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 14,
       },
       {
+        id: 15,
         link: 'https://images.unsplash.com/photo-1656453260540-268a06c29c73?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 15,
       },
       {
+        id: 16,
         link: 'https://images.unsplash.com/photo-1665816152071-4cccdeeb1583?q=80&w=1664&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 16,
       },
       {
+        id: 17,
         link: 'https://images.unsplash.com/photo-1678740268643-aa5777c2f16d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 17,
       },
       {
+        id: 18,
         link: 'https://images.unsplash.com/photo-1653038282392-bbca5f8a3f0d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 18,
       },
       {
+        id: 19,
         link: 'https://images.unsplash.com/photo-1575384938813-188de2f81d1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 19,
       },
       {
+        id: 20,
         link: 'https://images.unsplash.com/photo-1733570890170-49be2550189b?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 20,
       },
       {
+        id: 21,
         link: 'https://plus.unsplash.com/premium_photo-1715890451731-dc7e87984313?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 21,
       },
       {
+        id: 22,
         link: 'https://plus.unsplash.com/premium_photo-1682310316833-578612b07de7?q=80&w=1812&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 22,
       },
       {
+        id: 23,
         link: 'https://plus.unsplash.com/premium_photo-1681449855827-295c626f7b84?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 23,
       },
       {
+        id: 24,
         link: 'https://plus.unsplash.com/premium_photo-1664391827302-9d821c39762b?q=80&w=1643&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 24,
       },
       {
+        id: 25,
         link: 'https://images.unsplash.com/photo-1648115315559-620fb2f655aa?q=80&w=1674&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 25,
       },
       {
+        id: 26,
         link: 'https://images.unsplash.com/photo-1576173478758-2ada6f4aa9e2?q=80&w=1833&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 26,
       },
       {
+        id: 27,
         link: 'https://images.unsplash.com/photo-1688731789548-d48e75c02894?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 27,
       },
       {
+        id: 28,
         link: 'https://images.unsplash.com/photo-1660958639203-cbc9bb56955b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 28,
       },
       {
+        id: 29,
         link: 'https://plus.unsplash.com/premium_photo-1739612422471-856ba749b780?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 29,
       },
       {
+        id: 30,
         link: 'https://images.unsplash.com/photo-1694445482967-f3024c92852d?q=80&w=1682&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 30,
       },
       {
+        id: 31,
         link: 'https://images.unsplash.com/photo-1522338140262-f46f5913618a?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 31,
       },
       {
+        id: 32,
         link: 'https://images.unsplash.com/photo-1560869713-7d0a29430803?q=80&w=1826&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 32,
       },
       {
+        id: 33,
         link: 'https://images.unsplash.com/photo-1711454867327-4990937f8f18?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 33,
       },
       {
+        id: 34,
         link: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 34,
       },
       {
+        id: 35,
         link: 'https://images.unsplash.com/photo-1710839006592-4fdfc6caca80?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 35,
       },
       {
+        id: 36,
         link: 'https://plus.unsplash.com/premium_photo-1661576924581-a2a6c614f53b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 36,
       },
       {
+        id: 37,
         link: 'https://images.pexels.com/photos/10359950/pexels-photo-10359950.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
         produtoId: 37,
       },
       {
+        id: 38,
         link: 'https://images.unsplash.com/photo-1602532381225-eec578361933?q=80&w=1630&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 38,
       },
       {
+        id: 39,
         link: 'https://images.pexels.com/photos/5264269/pexels-photo-5264269.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
         produtoId: 39,
       },
       {
+        id: 40,
         link: 'https://images.unsplash.com/photo-1703353288357-c7efb9e6573a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         produtoId: 40,
       },
@@ -1036,72 +1122,6 @@ async function main() {
     );
     return;
   }
-  // Garante que os produtos específicos para os pedidos existam ou os cria
-  // Para o primeiro pedido: "Cadeira de Escritório Ergonômica"
-  let produtoPedido1 = await prisma.produto.findFirst({
-    where: { nome: 'Cadeira de Escritório Ergonômica' },
-  });
-
-  if (!produtoPedido1) {
-    console.warn('Produto "Cadeira de Escritório Ergonômica" não encontrado, criando...');
-    produtoPedido1 = await prisma.produto.create({
-      data: {
-        nome: 'Cadeira de Escritório Ergonômica',
-        descricao: 'Cadeira confortável com suporte lombar e ajuste de altura.',
-        preco: 499.9,
-        precoOriginal: 599.9,
-        frete: 50,
-        ativo: true,
-        categoriaId: categoriaCasaDeco.id,
-        marcaId: marcaX.id,
-        modelo: 'ERGOCAD',
-        numeroModelo: 'CE001',
-        condicao: 'novo',
-        dimensoes: '60x60x110 cm',
-        garantia: '24 meses',
-        voltagem: 'Não se aplica',
-        localizacaoProduto: 'SP',
-        quantidade: 35,
-        quantidadeVarejo: 1,
-      },
-    });
-  }
-  console.log(
-    `✅ Produto para Pedido 1 ("${produtoPedido1.nome}") (ID: ${produtoPedido1.id}) está pronto.`
-  );
-
-  // Para o segundo pedido: "Secador Íon Pro 2000W"
-  let produtoPedido2 = await prisma.produto.findFirst({
-    where: { nome: 'Secador Íon Pro 2000W' },
-  });
-
-  if (!produtoPedido2) {
-    console.warn('Produto "Secador Íon Pro 2000W" não encontrado, criando...');
-    produtoPedido2 = await prisma.produto.create({
-      data: {
-        nome: 'Secador Íon Pro 2000W',
-        descricao: 'Secador de cabelo com tecnologia de íons, protege os fios do calor excessivo',
-        preco: 199.99,
-        precoOriginal: 259.99,
-        frete: 20,
-        ativo: true,
-        categoriaId: categoriaBeleza.id,
-        marcaId: marcaX.id,
-        modelo: 'IonPro',
-        numeroModelo: 'SC2000',
-        condicao: 'novo',
-        dimensoes: '25x20x10 cm',
-        garantia: '6 meses',
-        voltagem: 'Bivolt',
-        localizacaoProduto: 'SP',
-        quantidade: 40,
-        quantidadeVarejo: 2,
-      },
-    });
-  }
-  console.log(
-    `✅ Produto para Pedido 2 ("${produtoPedido2.nome}") (ID: ${produtoPedido2.id}) está pronto.`
-  );
 
   // Cria Pedidos
   if (produto22 && produto31 && produto19) {
@@ -1109,6 +1129,7 @@ async function main() {
       data: [
         // ✅ SEMANA
         {
+          id: 1,
           quantidade: 1,
           clienteId: clienteJoao.id, // Usando clienteJoao ao invés de cliente
           dataCompra: new Date('2025-06-10T09:00:00Z'),
@@ -1122,6 +1143,7 @@ async function main() {
           assinado: 'João Silva',
         },
         {
+          id: 2,
           quantidade: 2,
           clienteId: clienteJoao.id, // Usando clienteJoao
           dataCompra: new Date('2025-06-11T14:00:00Z'),
@@ -1135,6 +1157,7 @@ async function main() {
           assinado: 'João Silva',
         },
         {
+          id: 3,
           quantidade: 1,
           clienteId: clienteMaria.id, // Usando clienteMaria
           dataCompra: new Date('2025-06-13T16:45:00Z'),
@@ -1150,6 +1173,7 @@ async function main() {
 
         // ✅ MÊS (fora da semana)
         {
+          id: 4,
           quantidade: 1,
           clienteId: clienteJoao.id, // Usando clienteJoao
           dataCompra: new Date('2025-05-20T11:20:00Z'),
@@ -1163,6 +1187,7 @@ async function main() {
           assinado: 'João Silva',
         },
         {
+          id: 5,
           quantidade: 2,
           clienteId: clienteMaria.id, // Usando clienteMaria
           dataCompra: new Date('2025-05-28T13:15:00Z'),
@@ -1178,6 +1203,7 @@ async function main() {
 
         // ❌ FORA DO MÊS
         {
+          id: 6,
           quantidade: 1,
           clienteId: clienteJoao.id, // Usando clienteJoao
           dataCompra: new Date('2025-04-10T10:00:00Z'),
