@@ -150,6 +150,9 @@ jobs:
           port: 22
           script: |
             echo "Rodando migrações do Prisma..."
+            source ~/.nvm/nvm.sh
+            nvm use 22.16.0
+            cd /var/www/server
             npx prisma migrate dev /var/www/backend/
 
       - name: Gerar Prisma Client
@@ -161,6 +164,9 @@ jobs:
           port: 22
           script: |
             echo "Gerando Prisma Client..."
+            source ~/.nvm/nvm.sh
+            nvm use 22.16.0
+            cd /var/www/server
             npx prisma generate /var/www/backend/
 
       - name: Reiniciar servidor backend
