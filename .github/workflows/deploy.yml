@@ -150,7 +150,8 @@ jobs:
           port: 22
           script: |
             echo "Rodando migrações do Prisma..."
-            npx prisma migrate dev /var/www/backend/
+            cd /var/www/server
+            npx prisma migrate dev --schema /var/www/backend/schema.prisma
 
       - name: Gerar Prisma Client
         uses: appleboy/ssh-action@v0.1.6
@@ -161,7 +162,8 @@ jobs:
           port: 22
           script: |
             echo "Gerando Prisma Client..."
-            npx prisma generate /var/www/backend/
+            cd /var/www/server
+            npx prisma generate --schema /var/www/backend/schema.prisma
 
       - name: Reiniciar servidor backend
         uses: appleboy/ssh-action@v0.1.6
