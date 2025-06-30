@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/pt-br';
 
-// Configuração do Day.js para usar o idioma português
 dayjs.extend(relativeTime);
 dayjs.locale('pt-br');
 
@@ -92,12 +91,6 @@ function ModalDetalhesPedido({ dados, onClose }: { dados: DetalhesPedido; onClos
           </p>
         </div>
         <button
-          onClick={avancarStatus}
-          className="mt-4 bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition w-full"
-        >
-          Avançar Status
-        </button>
-        <button
           onClick={onClose}
           className="mt-2 bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition w-full"
         >
@@ -113,6 +106,7 @@ export default function PaginaPedidos() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dadosModal, setDadosModal] = useState<DetalhesPedido | null>(null);
+  const [filtroStatus, setFiltroStatus] = useState<string | null>(null); // ADICIONADO
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -194,6 +188,31 @@ export default function PaginaPedidos() {
       </header>
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <h1 className="text-2xl font-bold mb-6 text-[#DF9829]">Gerenciamento de Pedidos</h1>
+
+        {/* FILTROS */}
+        <div className="mb-6 flex gap-4 flex-wrap">
+          <button
+            onClick={() => setFiltroStatus(null)}
+            className={`px-4 py-2 rounded font-semibold transition ${
+              filtroStatus === null ? 'bg-[#DF9829] text-white' : 'bg-gray-700 text-white'
+            }`}
+          >
+            Todos
+          </button>
+          {['pendente', 'pago', 'cancelado'].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFiltroStatus(status)}
+              className={`px-4 py-2 rounded font-semibold capitalize transition ${
+                filtroStatus === status ? 'bg-[#DF9829] text-white' : 'bg-gray-700 text-white'
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+
+        {/* TABELA */}
         <div className="bg-[#1A1615] rounded-lg shadow-lg overflow-x-auto">
           <table className="w-full text-left min-w-[900px]">
             <thead>
@@ -208,47 +227,49 @@ export default function PaginaPedidos() {
               </tr>
             </thead>
             <tbody>
-              {pedidos.map((pedido) => {
-                const { icon, className, label } = getStatusStyle(pedido.status);
-                return (
-                  <tr
-                    key={pedido.id}
-                    className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors"
-                  >
-                    <td className="p-4 font-bold">
-                      <div>#{pedido.id}</div>
-                      <div className="text-xs text-gray-400">
-                        {dayjs(pedido.dataCompra).fromNow()}
-                      </div>
-                    </td>
-                    <td className="p-4">{pedido.Cliente.nome}</td>
-                    <td className="p-4 text-center">{pedido.quantidade}</td>
-                    <td className="p-4 font-mono">
-                      {Number(pedido.valorPago).toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                      })}
-                    </td>
-                    <td className="p-4">{pedido.formaPagamento.toUpperCase()}</td>
-                    <td className="p-4">
-                      <div
-                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${className}`}
-                      >
-                        {icon}
-                        <span>{label}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 text-center">
-                      <button
-                        onClick={() => handleVerDetalhes(pedido.id)}
-                        className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition"
-                      >
-                        Ver Detalhes
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {pedidos
+                .filter((pedido) => !filtroStatus || pedido.status.toLowerCase() === filtroStatus)
+                .map((pedido) => {
+                  const { icon, className, label } = getStatusStyle(pedido.status);
+                  return (
+                    <tr
+                      key={pedido.id}
+                      className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors"
+                    >
+                      <td className="p-4 font-bold">
+                        <div>#{pedido.id}</div>
+                        <div className="text-xs text-gray-400">
+                          {dayjs(pedido.dataCompra).fromNow()}
+                        </div>
+                      </td>
+                      <td className="p-4">{pedido.Cliente.nome}</td>
+                      <td className="p-4 text-center">{pedido.quantidade}</td>
+                      <td className="p-4 font-mono">
+                        {Number(pedido.valorPago).toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        })}
+                      </td>
+                      <td className="p-4">{pedido.formaPagamento.toUpperCase()}</td>
+                      <td className="p-4">
+                        <div
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${className}`}
+                        >
+                          {icon}
+                          <span>{label}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-center">
+                        <button
+                          onClick={() => handleVerDetalhes(pedido.id)}
+                          className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition"
+                        >
+                          Ver Detalhes
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
