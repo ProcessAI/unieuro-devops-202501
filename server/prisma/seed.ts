@@ -1109,6 +1109,7 @@ async function main() {
       data: [
         // ✅ SEMANA
         {
+          id: 1,
           quantidade: 1,
           clienteId: clienteJoao.id, // Usando clienteJoao ao invés de cliente
           dataCompra: new Date('2025-06-10T09:00:00Z'),
@@ -1122,12 +1123,13 @@ async function main() {
           assinado: 'João Silva',
         },
         {
+          id: 2,
           quantidade: 2,
           clienteId: clienteJoao.id, // Usando clienteJoao
           dataCompra: new Date('2025-06-11T14:00:00Z'),
           produtoId: produto22.id,
           formaPagamento: 'Pix',
-          status: 'pago',
+          status: 'cancelado',
           valorPago: Number(produto22.preco) * 2,
           dataEntrega: new Date('2025-06-15T18:00:00Z'),
           notaFiscal: 'NF-10002',
@@ -1135,6 +1137,7 @@ async function main() {
           assinado: 'João Silva',
         },
         {
+          id: 3,
           quantidade: 1,
           clienteId: clienteMaria.id, // Usando clienteMaria
           dataCompra: new Date('2025-06-13T16:45:00Z'),
@@ -1150,12 +1153,13 @@ async function main() {
 
         // ✅ MÊS (fora da semana)
         {
+          id: 4,
           quantidade: 1,
           clienteId: clienteJoao.id, // Usando clienteJoao
           dataCompra: new Date('2025-05-20T11:20:00Z'),
           produtoId: produto1.id,
           formaPagamento: 'Pix',
-          status: 'pago',
+          status: 'pendente',
           valorPago: produto1.preco,
           dataEntrega: new Date('2025-05-25T18:00:00Z'),
           notaFiscal: 'NF-10004',
@@ -1163,6 +1167,7 @@ async function main() {
           assinado: 'João Silva',
         },
         {
+          id: 5,
           quantidade: 2,
           clienteId: clienteMaria.id, // Usando clienteMaria
           dataCompra: new Date('2025-05-28T13:15:00Z'),
@@ -1178,12 +1183,13 @@ async function main() {
 
         // ❌ FORA DO MÊS
         {
+          id: 6,
           quantidade: 1,
           clienteId: clienteJoao.id, // Usando clienteJoao
           dataCompra: new Date('2025-04-10T10:00:00Z'),
           produtoId: produto1.id,
           formaPagamento: 'Boleto',
-          status: 'pago',
+          status: 'pendente',
           valorPago: produto1.preco,
           dataEntrega: new Date('2025-04-15T18:00:00Z'),
           notaFiscal: 'NF-10006',

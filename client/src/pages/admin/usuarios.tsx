@@ -1,6 +1,7 @@
-// pages/admin/usuarios.tsx
 import { useEffect, useState } from 'react';
-import { Search, Filter, Download, UserPlus, Edit, Trash2, Eye, MoreHorizontal } from 'lucide-react';
+import { AdminHeader } from '@/components/AdminHeader';
+import { Footer } from '@/components/Footer';
+import { Search, Download, UserPlus, Edit, Eye, Trash2 } from 'lucide-react';
 
 type Usuario = {
   id: number;
@@ -8,263 +9,331 @@ type Usuario = {
   email: string;
   telefone: string;
   cpf: string;
-  cargo?: string;
   status: 'Ativo' | 'Inativo';
   verificado: boolean;
   dataJuncao: string;
-  dataNascimento: string;
   totalPedidos: number;
   totalAvaliacoes: number;
-  temEmpresa: boolean;
-  empresa?: {
-    id: number;
-    nome: string;
-    razaoSocial: string;
-  } | null;
+  empresa?: { id: number; nome: string; razaoSocial: string } | null;
 };
 
 export default function UserManagement() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [filteredUsuarios, setFilteredUsuarios] = useState<Usuario[]>([]);
+  const [filtered, setFiltered] = useState<Usuario[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('Todos');
-  const [cargoFilter, setCargoFilter] = useState('Todos');
+  const [statusFilter, setStatusFilter] = useState<'Todos' | 'Ativo' | 'Inativo'>('Todos');
+  const [editingUser, setEditingUser] = useState<Usuario | null>(null);
 
-  // Busca usuários do banco de dados
   useEffect(() => {
-    const buscarUsuarios = async () => {
-      try {
-        const response = await fetch('/api/usuarios');
-        const data = await response.json();
-        
-        if (data.success && data.usuarios) {
+    fetch('http://localhost:3333/usuarios', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
           setUsuarios(data.usuarios);
-          setFilteredUsuarios(data.usuarios);
-        } else {
-          console.error('Erro na resposta da API:', data.message);
+          setFiltered(data.usuarios);
         }
-      } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
-      }
-    };
-
-    buscarUsuarios();
+      })
+      .catch(console.error);
   }, []);
 
-  // Filtros
   useEffect(() => {
-    let filtered = usuarios;
-
+    let f = [...usuarios];
     if (searchTerm) {
-      filtered = filtered.filter(usuario =>
-        usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        usuario.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        usuario.cpf.includes(searchTerm) ||
-        usuario.telefone.includes(searchTerm) ||
-        (usuario.empresa?.nome && usuario.empresa.nome.toLowerCase().includes(searchTerm.toLowerCase()))
+      const t = searchTerm.toLowerCase();
+      f = f.filter(
+        (u) =>
+          u.nome.toLowerCase().includes(t) ||
+          u.email.toLowerCase().includes(t) ||
+          u.cpf.includes(t) ||
+          u.telefone.includes(t)
       );
     }
-
     if (statusFilter !== 'Todos') {
-      filtered = filtered.filter(usuario => usuario.status === statusFilter);
+      f = f.filter((u) => u.status === statusFilter);
     }
+    setFiltered(f);
+  }, [searchTerm, statusFilter, usuarios]);
 
-    if (cargoFilter !== 'Todos') {
-      filtered = filtered.filter(usuario => 
-        usuario.empresa?.nome === cargoFilter || usuario.cargo === cargoFilter
+  const handleSave = async (updated: Usuario) => {
+    try {
+      const res = await fetch(`http://localhost:3333/admin/usuarios/${updated.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) throw await res.json();
+      setUsuarios((us) => us.map((u) => (u.id === updated.id ? updated : u)));
+      setEditingUser(null);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao salvar usuário');
+    }
+  };
+
+  const toggleStatus = async (id: number) => {
+    try {
+      const res = await fetch(`http://localhost:3333/admin/usuarios/${id}/status`, {
+        method: 'PUT',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw data;
+      setUsuarios((us) =>
+        us.map((u) => (u.id === id ? { ...u, status: data.ativo ? 'Ativo' : 'Inativo' } : u))
       );
+    } catch (err: any) {
+      alert(err.message || 'Erro ao atualizar status');
     }
+  };
 
-    setFilteredUsuarios(filtered);
-  }, [searchTerm, statusFilter, cargoFilter, usuarios]);
-
-  const cargosUnicos = [...new Set(usuarios.map(u => u.empresa?.nome || u.cargo).filter(Boolean))];
+  const removeUser = async (id: number) => {
+    if (!confirm('Confirma exclusão?')) return;
+    try {
+      const res = await fetch(`http://localhost:3333/admin/usuarios/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw await res.json();
+      setUsuarios((us) => us.filter((u) => u.id !== id));
+    } catch (err: any) {
+      alert(err.message || 'Erro ao excluir usuário');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#130F0E] text-white">
-      {/* Header */}
-      <div className="bg-[#1a1715] border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-white">Gerenciamento de usuários</h1>
-              <p className="text-gray-400 mt-1">Gerencie os membros da sua equipe e suas permissões de conta aqui.</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="text-gray-400 hover:text-white">Desfazer</button>
-              <button className="text-gray-400 hover:text-white">Ver perfil</button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#130F0E] text-white flex flex-col">
+      <header className="bg-[#130F0E] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <AdminHeader />
         </div>
-      </div>
-
-      {/* Controles */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+      </header>
+      <main className="flex-grow max-w-7xl mx-auto px-4 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
+          <div className="flex flex-wrap gap-4 items-center">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Buscar"
+                placeholder="Buscar..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-[#2a2520] border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DF9829] focus:border-transparent"
+                className="bg-[#2a2520] border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DF9829]"
               />
             </div>
-            
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
               className="bg-[#2a2520] border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#DF9829]"
             >
-              <option value="Todos">Todos os status</option>
-              <option value="Ativo">Ativo</option>
-              <option value="Inativo">Inativo</option>
+              <option>Todos</option>
+              <option>Ativo</option>
+              <option>Inativo</option>
             </select>
-
-            <select
-              value={cargoFilter}
-              onChange={(e) => setCargoFilter(e.target.value)}
-              className="bg-[#2a2520] border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#DF9829]"
-            >
-              <option value="Todos">Todos os cargos</option>
-              {cargosUnicos.map(cargo => (
-                <option key={cargo} value={cargo}>{cargo}</option>
-              ))}
-            </select>
-
-            <button className="flex items-center gap-2 bg-[#2a2520] border border-gray-600 rounded-lg px-4 py-2 text-white hover:bg-[#3a332e] transition-colors">
-              <Filter className="w-4 h-4" />
-              Filtrar
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 bg-[#2a2520] border border-gray-600 rounded-lg px-4 py-2 text-white hover:bg-[#3a332e] transition-colors">
-              <Download className="w-4 h-4" />
-              Exportar
-            </button>
-            <button className="flex items-center gap-2 bg-[#DF9829] text-black rounded-lg px-4 py-2 font-semibold hover:bg-[#c8851f] transition-colors">
-              <UserPlus className="w-4 h-4" />
-              Adicionar usuário
-            </button>
           </div>
         </div>
 
-        {/* Tabela */}
         <div className="bg-[#1a1715] rounded-lg border border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]">
               <thead className="bg-[#2a2520] border-b border-gray-700">
                 <tr>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Nome completo</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Email</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Telefone</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Empresa</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Status</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Cadastro</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Pedidos</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-300">Ações</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Nome e CPF</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Email / Verif.</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Telefone</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Empresa</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Status</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Entrada</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Pedidos / Aval.</th>
+                  <th className="py-4 px-6 text-left text-gray-300">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {filteredUsuarios.map((usuario) => (
-                  <tr key={usuario.id} className="hover:bg-[#2a2520] transition-colors">
+                {filtered.map((u) => (
+                  <tr key={u.id} className="hover:bg-[#2a2520]">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-[#DF9829] to-[#c8851f] rounded-full flex items-center justify-center text-black font-semibold text-sm">
-                          {usuario.nome.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#DF9829] to-[#c8851f] flex items-center justify-center text-black font-semibold">
+                          {u.nome
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .slice(0, 2)}
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-white font-medium">{usuario.nome}</span>
-                          <span className="text-xs text-gray-400">CPF: {usuario.cpf}</span>
+                        <div>
+                          <div className="font-medium">{u.nome}</div>
+                          <div className="text-xs text-gray-400">CPF: {u.cpf}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex flex-col">
-                        <span className="text-gray-300">{usuario.email}</span>
-                        {usuario.verificado ? (
-                          <span className="text-xs text-green-400">✓ Verificado</span>
-                        ) : (
-                          <span className="text-xs text-red-400">Não verificado</span>
-                        )}
+                      <div>
+                        <div>{u.email}</div>
+                        <div
+                          className={`text-xs ${u.verificado ? 'text-green-400' : 'text-red-400'}`}
+                        >
+                          {u.verificado ? '✓ Verificado' : 'Não verificado'}
+                        </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-gray-300">{usuario.telefone}</td>
+                    <td className="py-4 px-6">{u.telefone}</td>
                     <td className="py-4 px-6">
-                      {usuario.empresa ? (
-                        <div className="flex flex-col">
-                          <span className="text-gray-300">{usuario.empresa.nome}</span>
-                          <span className="text-xs text-gray-500">{usuario.empresa.razaoSocial}</span>
-                        </div>
+                      {u.empresa ? (
+                        <>
+                          <div>{u.empresa.nome}</div>
+                          <div className="text-xs text-gray-500">{u.empresa.razaoSocial}</div>
+                        </>
                       ) : (
-                        <span className="text-gray-500">Cliente PF</span>
+                        <span className="text-gray-500">—</span>
                       )}
                     </td>
                     <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        usuario.status === 'Ativo' 
-                          ? 'bg-green-900 text-green-300' 
-                          : 'bg-red-900 text-red-300'
-                      }`}>
-                        ● {usuario.status}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          u.status === 'Ativo'
+                            ? 'bg-green-900 text-green-300'
+                            : 'bg-red-900 text-red-300'
+                        }`}
+                      >
+                        ● {u.status}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-gray-300">{usuario.dataJuncao}</td>
+                    <td className="py-4 px-6">{u.dataJuncao}</td>
                     <td className="py-4 px-6">
-                      <div className="flex flex-col">
-                        <span className="text-gray-300">{usuario.totalPedidos} pedidos</span>
-                        <span className="text-xs text-gray-500">{usuario.totalAvaliacoes} avaliações</span>
+                      <div>
+                        <div>{u.totalPedidos} pedidos</div>
+                        <div className="text-xs text-gray-500">{u.totalAvaliacoes} avaliações</div>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex items-center gap-2">
-                        <button className="p-1 hover:bg-[#3a332e] rounded text-gray-400 hover:text-white transition-colors">
-                          <Edit className="w-4 h-4" />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingUser(u)}
+                          className="p-1 hover:bg-[#3a332e] rounded"
+                        >
+                          <Edit className="w-4 h-4 text-gray-400 hover:text-white" />
                         </button>
-                        <button className="p-1 hover:bg-[#3a332e] rounded text-gray-400 hover:text-white transition-colors">
-                          <Eye className="w-4 h-4" />
+
+                        <button
+                          onClick={() => toggleStatus(u.id)}
+                          className="p-1 hover:bg-[#3a332e] rounded"
+                        >
+                          <Eye
+                            className={`w-4 h-4 ${
+                              u.status === 'Ativo'
+                                ? 'text-red-400 hover:text-red-600'
+                                : 'text-green-400 hover:text-green-600'
+                            }`}
+                          />
                         </button>
-                        <button className="p-1 hover:bg-[#3a332e] rounded text-gray-400 hover:text-red-400 transition-colors">
-                          <Trash2 className="w-4 h-4" />
+
+                        <button
+                          onClick={() => removeUser(u.id)}
+                          disabled={u.totalPedidos > 0 || u.totalAvaliacoes > 0}
+                          className="p-1 hover:bg-[#3a332e] rounded disabled:opacity-50"
+                        >
+                          <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-400" />
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-gray-400">
+                      Nenhum usuário encontrado.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
+      </main>
 
-        {filteredUsuarios.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <p>Nenhum usuário encontrado com os filtros aplicados.</p>
-          </div>
-        )}
+      <Footer />
 
-        {/* Paginação */}
-        <div className="flex items-center justify-between mt-6">
-          <p className="text-gray-400">
-            Mostrando {filteredUsuarios.length} de {usuarios.length} usuários
-          </p>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-2 bg-[#2a2520] border border-gray-600 rounded text-gray-300 hover:bg-[#3a332e] transition-colors">
-              Anterior
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onSave={handleSave}
+        />
+      )}
+    </div>
+  );
+}
+
+function EditUserModal({
+  user,
+  onClose,
+  onSave,
+}: {
+  user: Usuario;
+  onClose: () => void;
+  onSave: (u: Usuario) => void;
+}) {
+  const [form, setForm] = useState(user);
+
+  const handleChange = (k: keyof Usuario, v: any) => setForm((f) => ({ ...f, [k]: v }));
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(form);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <div className="bg-[#1A1615] p-6 rounded-lg w-full max-w-md">
+        <h2 className="text-xl font-bold text-[#DF9829] mb-4">Editar Usuário #{user.id}</h2>
+        <form onSubmit={submit} className="space-y-4">
+          <div>
+            <label className="block text-gray-300 mb-1">Nome</label>
+            <input
+              value={form.nome}
+              onChange={(e) => handleChange('nome', e.target.value)}
+              className="w-full bg-[#2a2520] border border-gray-600 rounded px-3 py-2 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-300 mb-1">Email</label>
+            <input
+              value={form.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              className="w-full bg-[#2a2520] border border-gray-600 rounded px-3 py-2 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-300 mb-1">Telefone</label>
+            <input
+              value={form.telefone}
+              onChange={(e) => handleChange('telefone', e.target.value)}
+              className="w-full bg-[#2a2520] border border-gray-600 rounded px-3 py-2 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-300 mb-1">CPF</label>
+            <input
+              value={form.cpf}
+              onChange={(e) => handleChange('cpf', e.target.value)}
+              className="w-full bg-[#2a2520] border border-gray-600 rounded px-3 py-2 text-white"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
+            >
+              Cancelar
             </button>
-            <button className="px-3 py-2 bg-[#DF9829] text-black rounded font-semibold">
-              1
-            </button>
-            <button className="px-3 py-2 bg-[#2a2520] border border-gray-600 rounded text-gray-300 hover:bg-[#3a332e] transition-colors">
-              2
-            </button>
-            <button className="px-3 py-2 bg-[#2a2520] border border-gray-600 rounded text-gray-300 hover:bg-[#3a332e] transition-colors">
-              Próximo
+            <button
+              type="submit"
+              className="px-4 py-2 bg-[#DF9829] text-black rounded hover:bg-[#c8851f]"
+            >
+              Salvar
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -999,7 +999,7 @@ app.post('/reset-password', async (req, res) => {
 app.get('/admin/pedidos-status', isAdminAuthenticated, async (req: Request, res: Response) => {
   try {
     const pedidos = await prisma.pedido.findMany({
-      where: { status: { in: ['pago', 'cancelado'] } },
+      where: { status: { in: ['pago', 'pendente', 'cancelado'] } },
       orderBy: { dataCompra: 'asc' },
       select: {
         id: true,
@@ -1055,6 +1055,45 @@ app.get('/admin/pedidos/:id', isAdminAuthenticated, async (req: Request, res: Re
   }
 });
 
+app.get('/produtos', async (req: Request, res: Response) => {
+  try {
+    const categoriaId = req.query.categoriaId ? Number(req.query.categoriaId) : undefined;
+    const q = req.query.q ? String(req.query.q) : undefined;
+
+    const where: Prisma.ProdutoWhereInput = {
+      ativo: true,
+      ...(categoriaId && { categoriaId }),
+      ...(q && {
+        nome: {
+          contains: q,
+          mode: 'insensitive',
+        },
+      }),
+    };
+
+    const produtos = await prisma.produto.findMany({
+      where,
+      include: {
+        Midias: { take: 1 },
+      },
+      orderBy: { nome: 'asc' },
+    });
+
+    const resultado = produtos.map((p) => ({
+      id: p.id,
+      nome: p.nome,
+      preco: Number(p.preco),
+      precoOriginal: Number(p.precoOriginal),
+      imagem: p.Midias[0]?.link ?? null,
+    }));
+
+    return res.sendSuccess({ produtos: resultado });
+  } catch (err) {
+    console.error(err);
+    return res.sendError('Erro ao buscar produtos.', 500);
+  }
+});
+
 app.get('/produto/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
@@ -1098,6 +1137,18 @@ app.get('/produto/:id', async (req: Request, res: Response) => {
     console.error(err);
 
     return res.sendError('Erro ao buscar produto.', 500);
+  }
+});
+
+app.get('/categorias', async (_req: Request, res: Response) => {
+  try {
+    const categorias = await prisma.categoria.findMany({
+      orderBy: { nome: 'asc' },
+    });
+    return res.sendSuccess(categorias);
+  } catch (err: any) {
+    console.error('Erro ao buscar categorias:', err);
+    return res.sendError('Erro ao buscar categorias.', 500);
   }
 });
 
@@ -1412,6 +1463,50 @@ app.get('/dashboard/categorias-vendas', async (req, res) => {
   } catch (err) {
     console.error('Erro ao buscar categorias mais vendidas:', err);
     res.status(500).json({ message: 'Erro ao buscar categorias mais vendidas.' });
+  }
+});
+
+app.put('/admin/usuarios/:id/status', isAdminAuthenticated, async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) return res.sendError('ID inválido', 400);
+
+  try {
+    const cliente = await prisma.cliente.findUnique({
+      where: { id },
+      select: { ativo: true },
+    });
+
+    if (!cliente) return res.sendError('Usuário não encontrado', 404);
+
+    const novoAtivo = !cliente.ativo;
+
+    await prisma.cliente.update({
+      where: { id },
+      data: { ativo: novoAtivo },
+    });
+
+    return res.sendSuccess({ id, ativo: novoAtivo });
+  } catch (err) {
+    console.error(err);
+    return res.sendError('Erro ao atualizar status', 500);
+  }
+});
+
+app.put('/admin/usuarios/:id', isAdminAuthenticated, async (req, res) => {
+  const id = Number(req.params.id);
+  const { nome, email, telefone, cpf } = req.body;
+  if (!nome || !email || !telefone || !cpf) {
+    return res.sendError('Todos os campos são obrigatórios.', 400);
+  }
+  try {
+    await prisma.cliente.update({
+      where: { id },
+      data: { nome, email, telefone, cpf },
+    });
+    return res.sendSuccess({ id, nome, email, telefone, cpf });
+  } catch (err) {
+    console.error(err);
+    return res.sendError('Erro ao atualizar usuário.', 500);
   }
 });
 

@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AdminHeader } from '@/components/AdminHeader';
 import { Footer } from '@/components/Footer';
-import {
-  IconCircleCheck,
-  IconCircleX,
-  IconReceipt,
-} from '@tabler/icons-react';
+import { IconCircleCheck, IconCircleX, IconReceipt, IconClock } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/pt-br';
@@ -35,8 +31,7 @@ const getProximoStatus = (statusAtual: string): string | null => {
   return proximos && proximos.length > 0 ? proximos[0] : null;
 };
 
-// --- TIPOS DE DADOS ---
-type StatusPedido = 'pago' | 'cancelado' | string;
+type StatusPedido = 'pendente' | 'pago' | 'cancelado' | string;
 
 type PedidoDaLista = {
   id: number;
@@ -60,22 +55,17 @@ type DetalhesPedido = {
   };
 };
 
-function ModalDetalhesPedido({
-  dados,
-  onClose,
-}: {
-  dados: DetalhesPedido;
-  onClose: () => void;
-}) {
+function ModalDetalhesPedido({ dados, onClose }: { dados: DetalhesPedido; onClose: () => void }) {
   const avancarStatus = async () => {
     const novoStatus = getProximoStatus(dados.status);
     if (!novoStatus) return alert('Este status não pode ser avançado.');
 
     try {
-      await fetch(`/api/admin/pedidos/${dados.id}/status`, {
+      await fetch(`http://localhost:3333/admin/pedidos/${dados.id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ novoStatus }),
+        credentials: 'include',
       });
       alert(`Status atualizado para: ${novoStatus}`);
       onClose();
@@ -89,13 +79,17 @@ function ModalDetalhesPedido({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
       <div className="bg-[#1A1615] p-6 rounded-lg shadow-xl w-full max-w-lg">
-        <h2 className="text-xl font-bold text-[#DF9829] mb-4">
-          Detalhes do Pedido #{dados.id}
-        </h2>
+        <h2 className="text-xl font-bold text-[#DF9829] mb-4">Detalhes do Pedido #{dados.id}</h2>
         <div className="space-y-2 text-white">
-          <p><strong>Usuário:</strong> {dados.Cliente.nome} ({dados.Cliente.email})</p>
-          <p><strong>Status:</strong> <span className="font-semibold uppercase">{dados.status}</span></p>
-          <p><strong>Data/Hora:</strong> {dayjs(dados.dataCompra).format('DD/MM/YYYY HH:mm')}</p>
+          <p>
+            <strong>Usuário:</strong> {dados.Cliente.nome} ({dados.Cliente.email})
+          </p>
+          <p>
+            <strong>Status:</strong> <span className="font-semibold uppercase">{dados.status}</span>
+          </p>
+          <p>
+            <strong>Data/Hora:</strong> {dayjs(dados.dataCompra).format('DD/MM/YYYY HH:mm')}
+          </p>
         </div>
         <button
           onClick={avancarStatus}
@@ -123,7 +117,7 @@ export default function PaginaPedidos() {
   useEffect(() => {
     const fetchPedidos = async () => {
       try {
-        const response = await fetch('/api/admin/pedidos-status', {
+        const response = await fetch('http://localhost:3333/admin/pedidos-status', {
           credentials: 'include',
         });
         const data = await response.json();
@@ -135,21 +129,44 @@ export default function PaginaPedidos() {
         setLoading(false);
       }
     };
-
     fetchPedidos();
   }, []);
 
-  const getStatusStyle = (status: StatusPedido) => {
-    switch (status) {
-      case 'pago': return { icon: <IconCircleCheck size={16} />, className: 'bg-green-600 text-white', label: 'Pago' };
-      case 'cancelado': return { icon: <IconCircleX size={16} />, className: 'bg-red-600 text-white', label: 'Cancelado' };
-      default: return { icon: <IconReceipt size={16} />, className: 'bg-gray-500 text-white', label: status };
+  const getStatusStyle = (statusRaw: StatusPedido) => {
+    const s = String(statusRaw).toLowerCase();
+    if (s === 'pendente') {
+      return {
+        icon: <IconClock size={16} />,
+        className: 'bg-yellow-600 text-black',
+        label: 'Pendente',
+      };
     }
+    if (s === 'pago') {
+      return {
+        icon: <IconCircleCheck size={16} />,
+        className: 'bg-green-600 text-white',
+        label: 'Pago',
+      };
+    }
+    if (s === 'cancelado') {
+      return {
+        icon: <IconCircleX size={16} />,
+        className: 'bg-red-600 text-white',
+        label: 'Cancelado',
+      };
+    }
+    return {
+      icon: <IconReceipt size={16} />,
+      className: 'bg-gray-500 text-white',
+      label: statusRaw,
+    };
   };
 
   const handleVerDetalhes = async (pedidoId: number) => {
     try {
-      const response = await fetch(`/api/admin/pedidos/${pedidoId}`, { credentials: 'include' });
+      const response = await fetch(`http://localhost:3333/admin/pedidos/${pedidoId}`, {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Falha ao buscar detalhes do pedido.');
       const data: DetalhesPedido = await response.json();
       setDadosModal(data);
@@ -192,25 +209,42 @@ export default function PaginaPedidos() {
             </thead>
             <tbody>
               {pedidos.map((pedido) => {
-                const statusStyle = getStatusStyle(pedido.status);
+                const { icon, className, label } = getStatusStyle(pedido.status);
                 return (
-                  <tr key={pedido.id} className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors">
+                  <tr
+                    key={pedido.id}
+                    className="border-b border-gray-800 hover:bg-[#1F1A19] transition-colors"
+                  >
                     <td className="p-4 font-bold">
                       <div>#{pedido.id}</div>
-                      <div className="text-xs text-gray-400">{dayjs(pedido.dataCompra).fromNow()}</div>
+                      <div className="text-xs text-gray-400">
+                        {dayjs(pedido.dataCompra).fromNow()}
+                      </div>
                     </td>
                     <td className="p-4">{pedido.Cliente.nome}</td>
                     <td className="p-4 text-center">{pedido.quantidade}</td>
-                    <td className="p-4 font-mono">{Number(pedido.valorPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td className="p-4 font-mono">
+                      {Number(pedido.valorPago).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      })}
+                    </td>
                     <td className="p-4">{pedido.formaPagamento.toUpperCase()}</td>
                     <td className="p-4">
-                      <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold w-fit ${statusStyle.className}`}>
-                        {statusStyle.icon}
-                        <span>{statusStyle.label}</span>
+                      <div
+                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${className}`}
+                      >
+                        {icon}
+                        <span>{label}</span>
                       </div>
                     </td>
                     <td className="p-4 text-center">
-                      <button onClick={() => handleVerDetalhes(pedido.id)} className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition">Ver Detalhes</button>
+                      <button
+                        onClick={() => handleVerDetalhes(pedido.id)}
+                        className="bg-[#DF9829] text-white font-semibold py-2 px-4 rounded-md hover:bg-[#C77714] transition"
+                      >
+                        Ver Detalhes
+                      </button>
                     </td>
                   </tr>
                 );
