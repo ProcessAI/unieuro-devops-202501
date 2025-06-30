@@ -14,7 +14,7 @@ export function Navbar() {
   const { categoriaId } = router.query;
 
   useEffect(() => {
-    fetch('http://localhost:3333/categorias', {
+    fetch('/api/categorias', {
       credentials: 'include',
     })
       .then((res) => res.json())

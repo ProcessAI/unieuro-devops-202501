@@ -35,8 +35,6 @@ interface Produto {
     marca?: Marca;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333/admin';
-
 // --- COMPONENTE PRINCIPAL DA PÁGINA ---
 const AdminProdutosPage: FC = () => {
     const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -54,9 +52,9 @@ const AdminProdutosPage: FC = () => {
             setError(null);
             try {
                 const [produtosRes, categoriasRes, marcasRes] = await Promise.all([
-                    fetch(`${API_URL}/produtos`),
-                    fetch(`${API_URL}/categorias`),
-                    fetch(`${API_URL}/marcas`),
+                    fetch(`/api/admin/produtos`),
+                    fetch(`/api/admin/categorias`),
+                    fetch(`/api/admin/marcas`),
                 ]);
 
                 if (!produtosRes.ok || !categoriasRes.ok || !marcasRes.ok) {
@@ -100,7 +98,7 @@ const AdminProdutosPage: FC = () => {
     const handleSave = async (produtoData: Omit<Produto, 'id' | 'categoria' | 'marca'>) => {
         try {
             const method = produtoEmEdicao ? 'PUT' : 'POST';
-            const url = produtoEmEdicao ? `${API_URL}/produtos/${produtoEmEdicao.id}` : `${API_URL}/produtos`;
+            const url = produtoEmEdicao ? `/api/admin/produtos/${produtoEmEdicao.id}` : `/api/admin/produtos`;
 
             const response = await fetch(url, {
                 method,
@@ -132,7 +130,7 @@ const AdminProdutosPage: FC = () => {
     const handleDelete = async (id: number) => {
         if (window.confirm('Tem certeza que deseja deletar este produto?')) {
             try {
-                const response = await fetch(`${API_URL}/produtos/${id}`, { method: 'DELETE' });
+                const response = await fetch(`/api/admin/produtos/${id}`, { method: 'DELETE' });
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => null);
                     throw new Error(errorData?.error || 'Falha ao deletar o produto.');

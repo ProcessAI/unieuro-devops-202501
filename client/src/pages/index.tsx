@@ -33,7 +33,7 @@ export default function Home() {
     if (categoriaId) params.set('categoriaId', String(categoriaId));
     if (q) params.set('q', String(q));
 
-    fetch(`http://localhost:3333/produtos?${params}`, {
+    fetch(`/api/produtos?${params}`, {
       credentials: 'include',
     })
       .then((r) => r.json())
@@ -42,7 +42,7 @@ export default function Home() {
   }, [categoriaId, q]);
 
   useEffect(() => {
-    fetch('http://localhost:3333/categorias', {
+    fetch('/api/categorias', {
       credentials: 'include',
     })
       .then((r) => r.json())

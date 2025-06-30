@@ -61,7 +61,7 @@ function ModalDetalhesPedido({ dados, onClose }: { dados: DetalhesPedido; onClos
     if (!novoStatus) return alert('Este status não pode ser avançado.');
 
     try {
-      await fetch(`http://localhost:3333/admin/pedidos/${dados.id}/status`, {
+      await fetch(`/api/admin/pedidos/${dados.id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ novoStatus }),
@@ -117,7 +117,7 @@ export default function PaginaPedidos() {
   useEffect(() => {
     const fetchPedidos = async () => {
       try {
-        const response = await fetch('http://localhost:3333/admin/pedidos-status', {
+        const response = await fetch('/api/admin/pedidos-status', {
           credentials: 'include',
         });
         const data = await response.json();
@@ -164,7 +164,7 @@ export default function PaginaPedidos() {
 
   const handleVerDetalhes = async (pedidoId: number) => {
     try {
-      const response = await fetch(`http://localhost:3333/admin/pedidos/${pedidoId}`, {
+      const response = await fetch(`/api/admin/pedidos/${pedidoId}`, {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Falha ao buscar detalhes do pedido.');

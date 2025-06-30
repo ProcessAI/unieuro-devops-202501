@@ -25,7 +25,7 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState<Usuario | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:3333/usuarios', { credentials: 'include' })
+    fetch('/api/usuarios', { credentials: 'include' })
       .then((r) => r.json())
       .then((data) => {
         if (data.success) {
@@ -56,7 +56,7 @@ export default function UserManagement() {
 
   const handleSave = async (updated: Usuario) => {
     try {
-      const res = await fetch(`http://localhost:3333/admin/usuarios/${updated.id}`, {
+      const res = await fetch(`/api/admin/usuarios/${updated.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -72,7 +72,7 @@ export default function UserManagement() {
 
   const toggleStatus = async (id: number) => {
     try {
-      const res = await fetch(`http://localhost:3333/admin/usuarios/${id}/status`, {
+      const res = await fetch(`/api/admin/usuarios/${id}/status`, {
         method: 'PUT',
         credentials: 'include',
       });
@@ -89,7 +89,7 @@ export default function UserManagement() {
   const removeUser = async (id: number) => {
     if (!confirm('Confirma exclusão?')) return;
     try {
-      const res = await fetch(`http://localhost:3333/admin/usuarios/${id}`, {
+      const res = await fetch(`/api/admin/usuarios/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
