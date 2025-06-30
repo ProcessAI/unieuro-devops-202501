@@ -1,4 +1,4 @@
-import { IconRosetteDiscount, IconArchive, IconPackage, IconChartPie2 } from '@tabler/icons-react';
+import { IconRosetteDiscount, IconArchive, IconPackage, IconChartPie2, IconUsers } from '@tabler/icons-react';
 import { Search } from 'lucide-react';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
@@ -40,6 +40,33 @@ export function AdminHeader() {
 
 
       <div className="flex items-center gap-1 sm:gap-3">
+<<<<<<< HEAD
+=======
+        {/* <Link
+          href=""
+          title="Ofertas"
+          className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
+        >
+          <IconRosetteDiscount size={20} />
+        </Link>
+
+        <Link
+          href=""
+          title="Produtos"
+          className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
+        >
+          <IconArchive size={20} />
+        </Link> */}
+
+        <Link
+          href="/admin/usuarios"
+          title="Users"
+          className="cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-[#DF9829] hover:bg-[#1a1615] hover:text-accent-foreground h-10 w-10"
+        >
+          <IconUsers size={20} />
+        </Link>
+
+>>>>>>> dev-38
         <Link
           href="/admin/clients" //Caminho para pedidos
           title="Pedidos"

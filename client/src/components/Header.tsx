@@ -1,17 +1,34 @@
-import { IconHeart, IconShoppingCart, IconUser } from '@tabler/icons-react';
+import { IconShoppingCart } from '@tabler/icons-react';
 import { Search } from 'lucide-react';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, KeyboardEvent } from 'react';
 
 export function Header() {
   const [isLogged, setIsLogged] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
-  const handleSearch = () => {
-    router.push('/product-search');
+  useEffect(() => {
+    if (Cookies.get('refreshToken')) {
+      setIsLogged(true);
+    }
+    const saved = localStorage.getItem('cartItemCount');
+    if (saved) setCartItemCount(parseInt(saved, 10));
+  }, []);
+
+  const doSearch = () => {
+    if (!searchTerm.trim()) return;
+
+    router.push(`/?q=${encodeURIComponent(searchTerm)}`);
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      doSearch();
+    }
   };
 
   const handleLogout = () => {
@@ -20,17 +37,6 @@ export function Header() {
     setIsLogged(false);
     router.push('/');
   };
-
-  useEffect(() => {
-    if (Cookies.get('refreshToken')) {
-      setIsLogged(true);
-    }
-
-    const savedCartItemCount = localStorage.getItem('cartItemCount');
-    if (savedCartItemCount) {
-      setCartItemCount(parseInt(savedCartItemCount, 10));
-    }
-  }, []);
 
   return (
     <div className="flex items-center justify-between h-16">
@@ -43,16 +49,21 @@ export function Header() {
           />
         </Link>
       </div>
-
       <div className="flex-1 max-w-2xl mx-8">
         <div className="relative">
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={onKeyDown}
             placeholder="Busque produtos, marcas e muito mais..."
             className="w-full h-10 px-3 py-2 pr-10 text-base md:text-sm rounded-md border-none bg-[#1A1615] placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <button onClick={handleSearch} className="cursor-pointer">
-            <Search className="absolute right-3 top-2.5 text-gray-400" size={20} />
+          <button
+            onClick={doSearch}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2"
+          >
+            <Search size={20} className="text-gray-400" />
           </button>
         </div>
       </div>
