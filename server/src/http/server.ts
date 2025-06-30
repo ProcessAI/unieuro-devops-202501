@@ -1415,6 +1415,95 @@ app.get('/dashboard/categorias-vendas', async (req, res) => {
   }
 });
 
+app.get('/products/search', async (req: Request, res: Response) => {
+  const searchQuery = req.query.query?.toString().trim();
+  if (!searchQuery) {
+    return res.sendError('Termo de busca não informado.', 400);
+  }
+
+  try {
+    const produtos = await prisma.produto.findMany({
+  where: {
+    nome: {
+      contains: searchQuery,
+      mode: 'insensitive',
+    },
+    ativo: true,
+  },
+  include: {
+    Midias: true,
+  },
+});
+
+const response = produtos.map(produto => {
+  const preco = Number(produto.preco);
+  const precoOriginal = Number(produto.precoOriginal);
+  const desconto = precoOriginal > preco ? Math.round(((precoOriginal - preco) / precoOriginal) * 100) : 0;
+
+  return {
+    id: produto.id,
+    nome: produto.nome,
+    descricao: produto.descricao,
+    preco,
+    precoOriginal,
+    desconto,
+    imagemUrl: produto.Midias[0]?.link || null,
+    minQuantidade: produto.quantidadeVarejo,
+  };
+});
+
+res.sendSuccess({ produtos: response });
+  } catch (error) {
+    console.error(error);
+    return res.sendError('Erro ao buscar produtos.', 500);
+  }
+});
+
+app.get('/products/category', async (req: Request, res: Response) => {
+  const categoriaId = req.query.query?.toString().trim();
+
+  if (!categoriaId) {
+    return res.sendError('Categoria não informada.', 400);
+  }
+
+  try {
+    const produtos = await prisma.produto.findMany({
+      where: {
+        categoriaId: Number(categoriaId),
+        ativo: true,
+      },
+      include: {
+        Midias: true,
+        Desconto: true,
+      },
+    });
+
+    const response = produtos.map(produto => {
+      const preco = Number(produto.preco);
+      const precoOriginal = Number(produto.precoOriginal);
+      const desconto = precoOriginal > preco
+        ? Math.round(((precoOriginal - preco) / precoOriginal) * 100)
+        : 0;
+
+      return {
+        id: produto.id,
+        nome: produto.nome,
+        descricao: produto.descricao,
+        preco,
+        precoOriginal,
+        desconto,
+        imagemUrl: produto.Midias[0]?.link || null,
+        minQuantidade: produto.quantidadeVarejo,
+      };
+    });
+
+    return res.sendSuccess({ produtos: response });
+  } catch (error) {
+    console.error(error);
+    return res.sendError('Erro ao buscar produtos da categoria.', 500);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

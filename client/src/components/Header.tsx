@@ -8,10 +8,13 @@ import { useEffect, useState } from 'react';
 export function Header() {
   const [isLogged, setIsLogged] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [ searchTerm, setSearchTerm ] = useState('')
   const router = useRouter();
 
   const handleSearch = () => {
-    router.push('/product-search');
+    if (searchTerm.trim()) {
+      router.push(`/product-search?query=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   const handleLogout = () => {
@@ -48,6 +51,9 @@ export function Header() {
         <div className="relative">
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {if (e.key === 'Enter') handleSearch()}}
             placeholder="Busque produtos, marcas e muito mais..."
             className="w-full h-10 px-3 py-2 pr-10 text-base md:text-sm rounded-md border-none bg-[#1A1615] placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           />

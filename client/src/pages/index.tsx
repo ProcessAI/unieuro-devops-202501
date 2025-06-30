@@ -49,12 +49,12 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-6 gap-8">
-          <CategoryCard icon={<Package />} title="Todos" />
-          <CategoryCard icon={<Smartphone />} title="Eletrônicos" />
-          <CategoryCard icon={<Shirt />} title="Moda" />
-          <CategoryCard icon={<House />} title="Casa & Deco" />
-          <CategoryCard icon={<Heart />} title="Beleza" />
-          <CategoryCard icon={<Percent />} title="Ofertas" />
+          <CategoryCard icon={<Package />} title="Todos" categoriaId='6' />
+          <CategoryCard icon={<Smartphone />} title="Eletrônicos" categoriaId='1' />
+          <CategoryCard icon={<Shirt />} title="Moda" categoriaId='2' />
+          <CategoryCard icon={<House />} title="Casa & Deco" categoriaId='3' />
+          <CategoryCard icon={<Heart />} title="Beleza" categoriaId='4' />
+          <CategoryCard icon={<Percent />} title="Ofertas" categoriaId='5' />
         </div>
       </div>
 
@@ -78,8 +78,7 @@ export default function Home() {
                   minQuantity={produto.minQuantity}
                 />
               </Link>
-            ))
-          ) : (
+            ))) : (
             <p className="text-white col-span-5 text-center">Nenhuma oferta disponível no momento.</p>
           )}
         </div>

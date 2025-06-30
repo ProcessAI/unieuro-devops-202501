@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-
 type Produto = {
   id: number;
   nome: string;
@@ -15,37 +14,59 @@ type Produto = {
   precoOriginal: number;
   quantidadeVarejo: number;
   imagemUrl: string;
+  image: string;
   desconto: number;
   minQuantidade: number;
 };
 
-export default function ProductSearchPage() {
-  const [loading, setLoading] = useState(false);
-  const [produtos, setProdutos] = useState<Produto[]>([]);
+export default function CategoryPage() {
   const router = useRouter();
   const { query } = router.query;
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (typeof query !== 'string' || query.trim() === '') return;
-    const search = typeof query === 'string' ? query : '';
+  const categoriaNome = query === '1'? 'Eletrônicos' : query === '2'? 'Moda' : query === '3'? 'Casae decoração' : query === '4'? 'Beleza': query === '5'? 'Ofertas' : 'Todos os Departamentos'
 
-    async function fetchProducts() {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/products/search?query=${encodeURIComponent(search)}`);
-        if (!res.ok) throw new Error('Erro ao buscar produtos');
-        const data = await res.json();
-        console.log('data', data)
-        setProdutos(data.produtos || []);
-      } catch (err) {
-        console.error('Erro ao buscar produtos:', err);
-      } finally {
-        setLoading(false);
-      }
+ useEffect(() => {
+  if (typeof query !== 'string' || query.trim() === '') return;
+  const idCat = query;
+
+  async function fetchCategoryProducts() {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/products/category?query=${encodeURIComponent(idCat)}`);
+      if (!res.ok) throw new Error('Erro ao buscar produtos da categoria');
+      const data = await res.json();
+      console.log('data category', data);
+      setProdutos(data.produtos || []);
+    } catch (err) {
+      console.error('Erro ao buscar produtos da categoria:', err);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchProducts();
-  }, [query]);
+  async function fetchOfertas() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/ofertas');
+      if (!res.ok) throw new Error('Erro ao buscar ofertas');
+      const data = await res.json();
+      console.log('data ofertas', data);
+      setProdutos(data.produtos || []);
+    } catch (err) {
+      console.error('Erro ao buscar ofertas:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (idCat === '5' || idCat === '6') {
+    fetchOfertas();
+  } else {
+    fetchCategoryProducts();
+  }
+}, [query]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#130F0E]">
@@ -62,7 +83,7 @@ export default function ProductSearchPage() {
         ) : (
           <>
             <div className="mb-10">
-              <p className="text-white text-l sm:text-2xl lg:text-3xl font-bold">Resultados da busca</p>
+              <p className="text-white text-l sm:text-2xl lg:text-3xl font-bold">{categoriaNome}</p>
             </div>
 
             <div className="grid grid-cols-5 gap-6">
@@ -71,7 +92,7 @@ export default function ProductSearchPage() {
                 <Link href={`/product/${produto.id}`}>
                 <ProductCard
                   key={produto.id}
-                  image={produto.imagemUrl}
+                  image={produto.imagemUrl || produto.image}
                   price={produto.preco.toFixed(2).replace('.', ',')}
                   originalPrice={produto.precoOriginal.toFixed(2).replace('.', ',')}
                   discount={produto.desconto}

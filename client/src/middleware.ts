@@ -11,6 +11,7 @@ const publicRoutes = [
   { path: '/', whenAuthenticated: 'next' },
   { path: '/cart', whenAuthenticated: 'next' },
   { path: '/product-search', whenAuthenticated: 'next' },
+  { path: '/category-page', whenAuthenticated: 'next' },
   { path: /^\/product\//, whenAuthenticated: 'next' },
   { path: /^\/pedido\//, whenAuthenticated: 'next' },
   // { path: "/admin/aprove-orders", whenAuthenticated: "next" },
