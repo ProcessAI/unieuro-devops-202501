@@ -40,8 +40,6 @@ export function AdminHeader() {
 
 
       <div className="flex items-center gap-1 sm:gap-3">
-<<<<<<< HEAD
-=======
         {/* <Link
           href=""
           title="Ofertas"
@@ -66,7 +64,6 @@ export function AdminHeader() {
           <IconUsers size={20} />
         </Link>
 
->>>>>>> dev-38
         <Link
           href="/admin/clients" //Caminho para pedidos
           title="Pedidos"
